@@ -9,3 +9,6 @@ Exemple d'un jeu réalisé avec nodejs et les websockets
 
 Exemple de jeu avec angularJS
   - https://www.toptal.com/web/making-html5-canvas-based-game-with-angularjs-and-createjs
+  
+Exemple lancement events à distance
+  -  http://tutorialzine.com/2015/02/smartphone-remote-control-for-presentations/
