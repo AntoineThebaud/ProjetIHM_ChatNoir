@@ -4,7 +4,6 @@ var path = require('path'); //'path' module (packaged with Node.js)
 
 // Create a new instance of Express
 var app = express();
-
 // Create a simple Express application
 app.configure(function() {
     // Turn down the logging activity | TODO : uncomment
@@ -19,3 +18,10 @@ var server = require('http').createServer(app).listen(port);
 
 // Create a Socket.IO server and attach it to the http server
 var io = require('socket.io').listen(server);
+
+// Listen for Socket.IO Connections. Once connected, start the game.
+var game = require('./blackcat'); // Import the game logic file.
+io.sockets.on('connection', function (socket) {
+    //console.log('client connected');
+    game.initGame(io, socket);
+});
