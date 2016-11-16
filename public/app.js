@@ -235,7 +235,7 @@ jQuery(function($){
                 App.Host.numPlayersInRoom += 1;
 
                 // If two players have joined, start the game!
-                if (App.Host.numPlayersInRoom === 2) {
+                if (App.Host.numPlayersInRoom === 1) {
                     debug_log('[START GAME : 1/?] - Host.updateWaitingScreen (trigger event emission)');
 
                     // Let the server know that two players are present.
