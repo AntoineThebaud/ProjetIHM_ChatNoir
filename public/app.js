@@ -194,7 +194,6 @@ jQuery(function($){
                 App.$gameArea.load("/partials/create-game.htm", function() {
                     // Display the URL on screen
                     $('#gameURL').text(window.location.href);
-
                     // Show the gameId / room id on screen
                     $('#spanNewGameCode').text(App.gameId);
                 });               
