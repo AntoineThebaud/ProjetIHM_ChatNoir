@@ -22,6 +22,6 @@ var io = require('socket.io').listen(server);
 // Listen for Socket.IO Connections. Once connected, start the game.
 var game = require('./blackcat'); // Import the game logic file.
 io.sockets.on('connection', function (socket) {
-    //console.log('client connected');
+    console.log('    LOG  - [index.js] client connected');
     game.initGame(io, socket);
 });
