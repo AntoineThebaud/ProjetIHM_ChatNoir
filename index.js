@@ -18,6 +18,8 @@ var server = require('http').createServer(app).listen(port);
 
 // Create a Socket.IO server and attach it to the http server
 var io = require('socket.io').listen(server);
+// Disable heartbeats
+//io.disable('heartbeats');
 
 // Listen for Socket.IO Connections. Once connected, start the game.
 var game = require('./blackcat'); // Import the game logic file.

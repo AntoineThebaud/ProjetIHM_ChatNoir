@@ -13,8 +13,20 @@
   font-size: 12px;
   line-height: 1.428571429;
   border-radius: 15px;
+  margin-left: 4px;
+}
+
+.ctm-btn-trap {
+    background-color: #2D592D;
+    border-color: #2D592D;
+    pointer-events: none;
 }
 
 .line-offset {
 	margin-left: 17px;
+}
+
+button:disabled {
+	background-color: #2D592D;
+    border-color: #2D592D;
 }

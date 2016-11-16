@@ -69,7 +69,7 @@ jQuery(function($){
          * @param data
          */
         beginNewGame : function(data) {
-            App[App.myRole].gameCountdown(data);
+            App[App.myRole].gameCreateMap(data);
         },
 
         /**
@@ -244,12 +244,40 @@ jQuery(function($){
             },
 
              /**
-             * Show the countdown screen
+             * blablablablablablablablabla
              */
-            gameCountdown : function() {
-
+            gameCreateMap : function() {
+        
                 // Prepare the game screen with new HTML
-                App.$gameArea.load("/partials/host-game.htm");
+                App.$gameArea.load("/partials/host-game.htm", function() {
+                    var btnArea = document.getElementById('btnArea');
+                    var btnRow;
+                    var btn;
+
+                    //Create 11 div
+                    for(var i = 0; i < 11; i++) {  
+                        btnRow = document.createElement('div');
+                        btnRow.id = "btnRow_"+i;
+                        if (i % 2 == 0) {
+                            btnRow.className = 'line-offset';
+                        }
+                        //Create 11 button for current div
+                        for(var j = 0; j < 11; j++) {
+                            btn = document.createElement('button');
+                            btn.id = "btn_"+i+'_'+j;
+                            btn.className = "btn btn-success ctm-btn-circle";
+                            //closure pour ajouter event sur chaque bouton
+                            btn.onclick = (function(thisBtn) {
+                                return function() {
+                                    console.log(thisBtn.id+" a été cliqué ! (2)");
+                                    thisBtn.className = "btn ctm-btn-trap ctm-btn-circle";
+                                };
+                            })(btn);
+                            btnRow.appendChild(btn);
+                        }
+                        btnArea.appendChild(btnRow);
+                    }
+                });
             }
         },
 
@@ -310,6 +338,15 @@ jQuery(function($){
 
                     $('#btnStart').prop('disabled', true);
                 }
+            },
+
+            /**
+             * Display 'Get Ready' while the countdown timer ticks down.
+             * @param hostData
+             */
+            gameCreateMap : function(hostData) {
+                App.Player.hostSocketId = hostData.mySocketId;
+                $('#gameArea').html('<div class="gameOver">Get Ready!</div>');
             }
         }
     };
