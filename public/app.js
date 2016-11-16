@@ -27,6 +27,8 @@ jQuery(function($){
             IO.socket.on('connected', IO.onConnected );
             IO.socket.on('newGameCreated', IO.onNewGameCreated );
             IO.socket.on('playerJoinedRoom', IO.playerJoinedRoom );
+            IO.socket.on('beginNewGame', IO.beginNewGame );
+            IO.socket.on('error', IO.error );
         },
 
         /**
@@ -60,6 +62,22 @@ jQuery(function($){
             // So on the 'host' browser window, the App.Host.updateWiatingScreen function is called.
             // And on the player's browser, App.Player.updateWaitingScreen is called.
             App[App.myRole].updateWaitingScreen(data);
+        },
+
+        /**
+         * Both players have joined the game.
+         * @param data
+         */
+        beginNewGame : function(data) {
+            App[App.myRole].gameCountdown(data);
+        },
+
+        /**
+         * An error has occurred.
+         * @param data
+         */
+        error : function(data) {
+            alert(data.message);
         }
     };
 
@@ -109,9 +127,6 @@ jQuery(function($){
         cacheElements: function() {
             App.$doc = $(document);
             App.$gameArea = $('#gameArea');
-            App.$templateIntroScreen = $('#intro-screen-template').html();
-            App.$templateNewGame = $('#create-game-template').html();
-            App.$templateJoinGame = $('#join-game-template').html();
         },
 
         /**
@@ -221,11 +236,20 @@ jQuery(function($){
 
                 // If two players have joined, start the game!
                 if (App.Host.numPlayersInRoom === 2) {
-                    // console.log('Room is full. Almost ready!');
+                    debug_log('[START GAME : 1/?] - Host.updateWaitingScreen (trigger event emission)');
 
                     // Let the server know that two players are present.
-                    IO.socket.emit('hostRoomFull',App.gameId);
+                    IO.socket.emit('hostRoomFull', App.gameId);
                 }
+            },
+
+             /**
+             * Show the countdown screen
+             */
+            gameCountdown : function() {
+
+                // Prepare the game screen with new HTML
+                App.$gameArea.load("/partials/host-game.htm");
             }
         },
 
@@ -269,6 +293,23 @@ jQuery(function($){
                 // Set the appropriate properties for the current player.
                 App.myRole = 'Player';
                 App.Player.myName = data.playerName;
+            },
+
+            /**
+             * Display the waiting screen for player 1
+             * @param data
+             */
+            updateWaitingScreen : function(data) {
+                if(IO.socket.socket.sessionid === data.mySocketId){
+                    App.myRole = 'Player';
+                    App.gameId = data.gameId;
+
+                    $('#playerWaitingMessage')
+                        .append('<p/>')
+                        .text('Joined Game ' + data.gameId + '. Please wait for game to begin.');
+
+                    $('#btnStart').prop('disabled', true);
+                }
             }
         }
     };

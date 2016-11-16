@@ -9,6 +9,7 @@ exports.initGame = function(sio, socket){
 
     // Host Events
     gameSocket.on('hostCreateNewGame', hostCreateNewGame);
+    gameSocket.on('hostRoomFull', hostPrepareGame);
 
     // Player Events
     gameSocket.on('playerJoinGame', playerJoinGame);
@@ -31,6 +32,21 @@ function hostCreateNewGame() {
     this.join(thisGameId.toString());
 };
 
+/*
+ * Two players have joined. Alert the host!
+ * @param gameId The game ID / room ID
+ */
+function hostPrepareGame(gameId) {
+    debug_log('[START GAME : 1/?] - hostPrepareGame (handler of hostRoomFull)');
+
+    var sock = this;
+    var data = {
+        mySocketId : sock.id,
+        gameId : gameId
+    };
+    //console.log("All Players Present. Preparing game...");
+    io.sockets.in(data.gameId).emit('beginNewGame', data);
+}
 
 /* *****************************
    *                           *
@@ -65,10 +81,9 @@ function playerJoinGame(data) {
 
         // Emit an event notifying the clients that the player has joined the room.
         io.sockets.in(data.gameId).emit('playerJoinedRoom', data);
-
     } else {
         // Otherwise, send an error message back to the player.
-        this.emit('error',{message: "This room does not exist."} );
+        this.emit('error', {message: "This room does not exist."});
     }
 }
 
