@@ -25,7 +25,7 @@ function hostCreateNewGame() {
     this.emit('newGameCreated', {gameId: thisGameId, mySocketId: this.id});
 
     // Join the Room and wait for the players
-    this.join(thisGameId.toString());
+    //this.join(thisGameId.toString());
 };
 
 // For debug
