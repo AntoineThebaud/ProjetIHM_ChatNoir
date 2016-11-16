@@ -7,11 +7,9 @@ exports.initGame = function(sio, socket){
     gameSocket = socket;
     gameSocket.emit('connected', { message: "You are connected!" });
 
-    // Host Events
+    // Events
     gameSocket.on('hostCreateNewGame', hostCreateNewGame);
     gameSocket.on('hostRoomFull', hostPrepareGame);
-
-    // Player Events
     gameSocket.on('playerJoinGame', playerJoinGame);
 }
 
@@ -48,11 +46,9 @@ function hostPrepareGame(gameId) {
     io.sockets.in(data.gameId).emit('beginNewGame', data);
 }
 
-/* *****************************
-   *                           *
-   *     PLAYER FUNCTIONS      *
-   *                           *
-   ***************************** */
+/********************************
+ *       PLAYER FUNCTIONS       *
+ *******************************/
 
 /**
  * A player clicked the 'START GAME' button.
@@ -77,12 +73,9 @@ function playerJoinGame(data) {
         // Join the room
         sock.join(data.gameId);
 
-        //console.log('Player ' + data.playerName + ' joining game: ' + data.gameId );
-
         // Emit an event notifying the clients that the player has joined the room.
         io.sockets.in(data.gameId).emit('playerJoinedRoom', data);
     } else {
-        // Otherwise, send an error message back to the player.
         this.emit('error', {message: "This room does not exist."});
     }
 }

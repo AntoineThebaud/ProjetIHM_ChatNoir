@@ -1,29 +1,17 @@
-;
 jQuery(function($){    
     'use strict';
 
-    /**
-     * All the code relevant to Socket.IO is collected in the IO namespace.
-     */
+    // Variable utilisée comme namespace. Regroupe le code concernant Socket.IO
     var IO = {
 
-        /**
-         * This is called when the page is displayed. It connects the Socket.IO client
-         * to the Socket.IO server
-         */
+        // Fonction appelée au premier chargement de la page.
+        // - initialise le lien entre les sockets client et serveur.
+        // - initialise les events
         init: function() {
+            // lien serveur <-> client
             IO.socket = io.connect();
-            IO.socket.on('connect', function() {
-                debug_log('[CONNECTION] IO.init OK');
-            });
-            IO.bindEvents();
-        },
-
-        /**
-         * While connected, Socket.IO will listen to the following events emitted
-         * by the Socket.IO server, then run the appropriate function.
-         */
-        bindEvents : function() {
+            
+            // events
             IO.socket.on('connected', IO.onConnected );
             IO.socket.on('newGameCreated', IO.onNewGameCreated );
             IO.socket.on('playerJoinedRoom', IO.playerJoinedRoom );
@@ -31,20 +19,14 @@ jQuery(function($){
             IO.socket.on('error', IO.error );
         },
 
-        /**
-         * The client is successfully connected!
-         */
+        // handler. Connexion établie
         onConnected : function(data) {
             // Cache a copy of the client's socket.IO session ID on the App
             App.mySocketId = IO.socket.socket.sessionid;
-            // console.log(data.message);
             debug_log('[CONNECTION] IO.onConnected OK : ' + data.message);
         },
 
-        /**
-         * A new game has been created and a random game ID has been generated.
-         * @param data {{ gameId: int, mySocketId: * }}
-         */
+        // handler. Partie créée. Renvoit vers Host.gameInit
         onNewGameCreated : function(data) {
             debug_log('[CREATE NEW GAME : 3/5] - IO.onNewGameCreated (handle event = call Host.gameInit)');
             App.Host.gameInit(data);
@@ -64,23 +46,18 @@ jQuery(function($){
             App[App.myRole].updateWaitingScreen(data);
         },
 
-        /**
-         * Both players have joined the game.
-         * @param data
-         */
+        // handler. lancement de la partie.
         beginNewGame : function(data) {
             App[App.myRole].gameCreateMap(data);
         },
 
-        /**
-         * An error has occurred.
-         * @param data
-         */
+        // handler. Popup d'erreur
         error : function(data) {
             alert(data.message);
         }
     };
 
+    // Variable utilisée comme namespace. Regroupe le code concernant les affichages côté client, serveur..
     var App = {
 
         /**
@@ -144,10 +121,7 @@ jQuery(function($){
          *             Game Logic              *
          * *********************************** */
 
-        /**
-         * Show the initial Anagrammatix Title Screen
-         * (with Start and Join buttons)
-         */
+        // écran d'accueil
         showInitScreen: function() {
             App.$gameArea.load("/partials/intro-screen.htm");
         },
@@ -269,7 +243,6 @@ jQuery(function($){
                             //closure pour ajouter event sur chaque bouton
                             btn.onclick = (function(thisBtn) {
                                 return function() {
-                                    console.log(thisBtn.id+" a été cliqué ! (2)");
                                     thisBtn.className = "btn ctm-btn-trap ctm-btn-circle";
                                 };
                             })(btn);
