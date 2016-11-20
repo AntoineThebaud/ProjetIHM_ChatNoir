@@ -299,6 +299,7 @@ jQuery(function($){
             /**
              * Display the waiting screen for player 1
              * @param data
+             * TODO : à changer/supprimer ?
              */
             updateWaitingScreen : function(data) {
                 if(IO.socket.socket.sessionid === data.mySocketId){
@@ -313,13 +314,9 @@ jQuery(function($){
                 }
             },
 
-            /**
-             * Display 'Get Ready' while the countdown timer ticks down.
-             * @param hostData
-             */
             gameCreateMap : function(hostData) {
                 App.Player.hostSocketId = hostData.mySocketId;
-                $('#gameArea').html('<div class="gameOver">Get Ready!</div>');
+                App.$gameArea.load("/partials/cat-screen.htm");
             }
         }
     };
