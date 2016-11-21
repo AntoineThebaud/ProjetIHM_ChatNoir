@@ -26,24 +26,18 @@ jQuery(function($){
             debug_log('[CONNECTION] IO.onConnected OK : ' + data.message);
         },
 
-        // handler. Partie créée. Renvoit vers Host.gameInit
+        // handler. Partie créée. Renvoit vers Trap.gameInit
         onNewGameCreated : function(data) {
-            debug_log('[CREATE NEW GAME : 3/5] - IO.onNewGameCreated (handle event = call Host.gameInit)');
-            App.Host.gameInit(data);
+            debug_log('[CREATE NEW GAME : 3/5] - IO.onNewGameCreated (handle event = call Trap.gameInit)');
+            App.Trap.gameInit(data);
         },
 
-        /**
-         * A player has successfully joined the game.
-         * @param data {{playerName: string, gameId: int, mySocketId: int}}
-         */
-        playerJoinedRoom : function(data) {
-            // When a player joins a room, do the updateWaitingScreen funciton.
-            // There are two versions of this function: one for the 'host' and
-            // another for the 'player'.
-            //
-            // So on the 'host' browser window, the App.Host.updateWiatingScreen function is called.
-            // And on the player's browser, App.Player.updateWaitingScreen is called.
-            App[App.myRole].updateWaitingScreen(data);
+        //handler. Connexion du joueur chat
+        playerJoinedRoom : function() {
+            // When a player joins a room, do the updateWaitingScreen function.
+            // Il y a 2 versions pour cette fonction (trap & cat)
+            // Respectivement App.Trap.updateWaitingScreen & App.Cat.updateWaitingScreen
+            App[App.myRole].updateWaitingScreen();
         },
 
         // handler. lancement de la partie.
@@ -68,9 +62,9 @@ jQuery(function($){
         gameId: 0,
 
         /**
-         * This is used to differentiate between 'Host' and 'Player' browsers.
+         * This is used to differentiate between 'Trap' and 'Cat' browsers.
          */
-        myRole: '',   // 'Player' or 'Host'
+        myRole: '',   // 'Trap' or 'Cat'
 
         /**
          * The Socket.IO socket object identifier. This is unique for
@@ -89,137 +83,73 @@ jQuery(function($){
          *                Setup                *
          * *********************************** */
 
-        /**
-         * This runs when the page initially loads.
-         */
+        // fonction d'initialisation appelée au chargement de la page
         init: function () {
             App.cacheElements();
             App.showInitScreen();
             App.bindEvents();
         },
 
-        /**
-         * Create references to on-screen elements used throughout the game.
-         */
+        // Création de variables 'alias' pour manipuler la page
         cacheElements: function() {
             App.$doc = $(document);
             App.$gameArea = $('#gameArea');
         },
 
-        /**
-         * Create some click handlers for the various buttons that appear on-screen.
-         */
+
+        // Ajout d'events pour les boutons de l'écran d'accueil
         bindEvents: function() {
-            // Host
-            App.$doc.on('click', '#btnCreateGame', App.Host.onCreateClick);
-            // Player
-            App.$doc.on('click', '#btnJoinGame', App.Player.onJoinClick);
-            App.$doc.on('click', '#btnStart', App.Player.onPlayerStartClick);
+            // Trap
+            App.$doc.on('click', '#btnCreateGame', App.Trap.onCreateClick);
+            // Cat
+            App.$doc.on('click', '#btnJoinGame', App.Cat.onJoinClick);
         },
 
         /* *************************************
          *             Game Logic              *
          * *********************************** */
 
-        // écran d'accueil
+        // Ecran d'accueil
         showInitScreen: function() {
             App.$gameArea.load("/partials/intro-screen.htm");
         },
 
-        Host : {
+        Trap : {
 
-            /**
-             * Contains references to player data
-             */
-            players : [],
+            // Référence vers le joueur chat
+            cat: '',
 
-            /**
-             * Flag to indicate if a new game is starting.
-             * This is used after the first game ends, and players initiate a new game
-             * without refreshing the browser windows.
-             */
-            isNewGame : false,
-
-            /**
-             * Keep track of the number of players that have joined the game.
-             */
-            numPlayersInRoom: 0,
-
-            /**
-             * A reference to the correct answer for the current round.
-             */
-            currentCorrectAnswer: '',
-
-            /**
-             * Handler for the "Start" button on the Title Screen.
-             */
+            // Handler. Le bouton 'START' sur l'écran d'accueil a été cliqué
             onCreateClick: function() {
-                debug_log('[CREATE NEW GAME : 1/5] - Host.onCreateClick (button event handler)');
+                debug_log('[CREATE NEW GAME : 1/5] - Trap.onCreateClick (button event handler)');
                 IO.socket.emit('hostCreateNewGame');
             },
 
-            /**
-             * The Host screen is displayed for the first time.
-             * @param data{{ gameId: int, mySocketId: * }}
-             */
+            // Handler. L'écran du serveur (Trap) est affiché pour la première fois.
             gameInit: function (data) {
-                debug_log('[CREATE NEW GAME : 4/5] - Host.gameInit (initialize variables)');
-                App.gameId = data.gameId;
+                debug_log('[CREATE NEW GAME : 4/5] - Trap.gameInit (initialize variables)');
                 App.mySocketId = data.mySocketId;
-                App.myRole = 'Host';
-                App.Host.numPlayersInRoom = 0;
+                App.myRole = 'Trap';
 
-                App.Host.displayNewGameScreen();
-                // console.log("Game started with ID: " + App.gameId + ' by host: ' + App.mySocketId);
+                App.Trap.displayNewGameScreen();
             },
 
-            /**
-             * Show the Host screen containing the game URL and unique game ID
-             */
+            // Affichage de l'écran d'attente côté serveur
             displayNewGameScreen : function() {
-                debug_log('[CREATE NEW GAME : 5/5] - Host.displayNewGameScreen (change HTML body)');
-
-                // Fill the game screen with the appropriate HTML          
-                App.$gameArea.load("/partials/create-game.htm", function() {
-                    // Display the URL on screen
-                    $('#gameURL').text(window.location.href);
-                    // Show the gameId / room id on screen
-                    $('#spanNewGameCode').text(App.gameId);
-                });               
+                debug_log('[CREATE NEW GAME : 5/5] - Trap.displayNewGameScreen (change HTML body)');
+       
+                App.$gameArea.load("/partials/create-game.htm");
             },
 
-            /**
-             * Update the Host screen when the first player joins
-             * @param data{{playerName: string}}
-             */
-            updateWaitingScreen: function(data) {
-                // If this is a restarted game, show the screen.
-                if ( App.Host.isNewGame ) {
-                    App.Host.displayNewGameScreen();
-                }
-                // Update host screen
-                $('#playersWaiting')
-                    .append('<p/>')
-                    .text('Player ' + data.playerName + ' joined the game.');
+            // TODO : a virer ?
+            updateWaitingScreen: function() {
+                debug_log('[START GAME : 1/?] - Trap.updateWaitingScreen (trigger event emission)');
 
-                // Store the new player's data on the Host.
-                App.Host.players.push(data);
-
-                // Increment the number of players in the room
-                App.Host.numPlayersInRoom += 1;
-
-                // If two players have joined, start the game!
-                if (App.Host.numPlayersInRoom === 1) {
-                    debug_log('[START GAME : 1/?] - Host.updateWaitingScreen (trigger event emission)');
-
-                    // Let the server know that two players are present.
-                    IO.socket.emit('hostRoomFull', App.gameId);
-                }
+                // TODO : commentaire pertinent
+                IO.socket.emit('hostRoomFull');
             },
 
-             /**
-             * blablablablablablablablabla
-             */
+            // Affichage de l'écran de jeu du poseur de piège
             gameCreateMap : function() {
         
                 // Prepare the game screen with new HTML
@@ -254,68 +184,33 @@ jQuery(function($){
             }
         },
 
-        Player : {
-            /**
-             * A reference to the socket ID of the Host
-             */
+        Cat : {
+
+            // Référence vers la socket ID du serveur (Trap)
             hostSocketId: '',
 
-            /**
-             * The player's name entered on the 'Join' screen.
-             */
-            myName: '',
-
-            /**
-             * Click handler for the 'JOIN' button
-             */
+            // Handler. Le bouton 'JOIN' a été cliqué
             onJoinClick: function () {
-                debug_log('[JOIN NEW GAME : 1/3] - Player.onJoinClick (button event handler)');
+                debug_log('[JOIN NEW GAME : 1/2] - Cat.onJoinClick (button event handler)');
 
                 // Display the Join Game HTML on the player's screen.    
                 App.$gameArea.load("/partials/join-game.htm");
-            },
-
-            /**
-             * The player entered their name and gameId (hopefully)
-             * and clicked Start.
-             */
-            onPlayerStartClick: function() {
-                debug_log('[JOIN NEW GAME : 2/3] - Player.onPlayerStartClick (button event handler)');
-
-                // collect data to send to the server
-                var data = {
-                    gameId : +($('#inputGameId').val()),
-                    playerName : $('#inputPlayerName').val() || 'anon'
-                };
 
                 // Send the gameId and playerName to the server
-                IO.socket.emit('playerJoinGame', data);
+                IO.socket.emit('playerJoinGame');
 
                 // Set the appropriate properties for the current player.
-                App.myRole = 'Player';
-                App.Player.myName = data.playerName;
+                App.myRole = 'Cat';
             },
 
-            /**
-             * Display the waiting screen for player 1
-             * @param data
-             * TODO : à changer/supprimer ?
-             */
-            updateWaitingScreen : function(data) {
-                if(IO.socket.socket.sessionid === data.mySocketId){
-                    App.myRole = 'Player';
-                    App.gameId = data.gameId;
-
-                    $('#playerWaitingMessage')
-                        .append('<p/>')
-                        .text('Joined Game ' + data.gameId + '. Please wait for game to begin.');
-
-                    $('#btnStart').prop('disabled', true);
-                }
+            // TODO : il faut virer ce truc
+            updateWaitingScreen : function() {
+                App.myRole = 'Cat';
             },
 
+            // Affichage de l'écran de jeu du chat
             gameCreateMap : function(hostData) {
-                App.Player.hostSocketId = hostData.mySocketId;
+                App.Cat.hostSocketId = hostData.mySocketId;
                 App.$gameArea.load("/partials/cat-screen.htm");
             }
         }
