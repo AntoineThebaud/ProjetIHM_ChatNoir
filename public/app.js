@@ -108,7 +108,7 @@ jQuery(function($){
                     for(var i = 0; i < 11; i++) {  
                         btnRow = document.createElement('div');
                         btnRow.id = "btnRow_"+i;
-                        if (i % 2 == 0) {
+                        if (i % 2 == 1) {
                             btnRow.className = 'line-offset';
                         }
                         // Créé 11 boutons pour la ligne de la grille courante
@@ -121,12 +121,18 @@ jQuery(function($){
                             btn.onclick = (function(thisBtn) {
                                 return function() {
                                     thisBtn.className = "btn ctm-btn-trap ctm-btn-circle";
+                                    // TODO : emettre un event à blackcat.js
+                                    // c'est blackcat.js qui se charge de gérer la partie,
+                                    // de tester si le chat est bloqué etc..
                                 };
                             })(btn);
                             btnRow.appendChild(btn);
                         }
                         btnArea.appendChild(btnRow);
                     }
+
+                    // Initialisation du chat (au milieu de la map)
+                    $('#btn_5_5').attr('class', 'btn btn-danger ctm-btn-circle');
                 });
             }
         },
@@ -179,6 +185,7 @@ jQuery(function($){
 
             onMoveButton: function(direction) {
                 console.log("Yolo swag : " + direction);
+                // TODO : emettre un event à blackcat.js
             }
         }
     };

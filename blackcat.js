@@ -1,7 +1,12 @@
 var io;
 var gameSocket;
+
+// variables de controle pour le lancement de la partie
 var serverReady;
 var catReady;
+
+// garde en mémoire la position du chat
+var catPosition;
 
 exports.initGame = function(sio, socket) {
 	debug_log('initGame');
@@ -14,7 +19,7 @@ exports.initGame = function(sio, socket) {
     gameSocket.on('hostRoomFull', hostRoomFull);
     gameSocket.on('clientJoinGame', clientJoinGame);
 
-    // Initilisation des variables de controle pour le lancement de la partie
+    // Initilisation des variables de controle
     serverReady = false;
     catReady = false;
 }
