@@ -10,7 +10,6 @@ jQuery(function($){
         init: function() {
             // lien serveur <-> client
             IO.socket = io.connect();
-            
             // events
             IO.socket.on('connected', IO.onConnected );
             IO.socket.on('newGameCreated', IO.onNewGameCreated );
@@ -18,20 +17,20 @@ jQuery(function($){
             IO.socket.on('error', IO.error );
         },
 
-        // handler. Connexion établie
+        // Handler. Connexion établie
         onConnected : function(data) {
-            // Cache a copy of the client's socket.IO session ID on the App
+            // Met en cache une copie du session ID du client
             App.mySocketId = IO.socket.socket.sessionid;
             debug_log('[CONNECTION] IO.onConnected OK : ' + data.message);
         },
 
-        // handler. Partie créée. Renvoit vers Trap.gameInit
+        // Handler. Partie créée. Renvoit vers Trap.gameInit
         onNewGameCreated : function(data) {
             debug_log('[CREATE NEW GAME : 3/5] - IO.onNewGameCreated');
-            App.Trap.gameInit(data);
+            App.Trap.displayWaitingScreen(data);
         },
 
-        // handler. lancement de la partie.
+        // Handler. lancement de la partie.
         beginNewGame : function(data) {
             debug_log('[BEGIN NEW GAME : 2/2] - IO.beginNewGame');
             // Il y a 2 versions pour cette fonction (Trap & Cat)
@@ -48,115 +47,76 @@ jQuery(function($){
     // Variable utilisée comme namespace. Regroupe le code concernant les affichages côté client, serveur..
     var App = {
 
-        /**
-         * Keep track of the gameId, which is identical to the ID
-         * of the Socket.IO Room used for the players and host to communicate
-         *
-         */
-        gameId: 0,
+        // Variable utilisée pour différencier les traitements (affichages..) des deux écrans
+        myRole: '', // aura comme valeur 'Trap' ou 'Cat'
 
-        /**
-         * This is used to differentiate between 'Trap' and 'Cat' browsers.
-         */
-        myRole: '',   // 'Trap' or 'Cat'
-
-        /**
-         * The Socket.IO socket object identifier. This is unique for
-         * each player and host. It is generated when the browser initially
-         * connects to the server when the page loads for the first time.
-         */
+        // L'identifiant de l'objet socket (de Socket.IO).
+        // Est généré lorsque la page est chargée pour la première fois
         mySocketId: '',
 
-        /**
-         * Identifies the current round. Starts at 0 because it corresponds
-         * to the array of word data stored on the server.
-         */
+        // Compteur pour les tours de jeu
         currentRound: 0,
 
-        /* *************************************
-         *                Setup                *
-         * *********************************** */
-
-        // fonction d'initialisation appelée au chargement de la page
+        // Fonction d'initialisation appelée au chargement de la page
         init: function () {
-            App.cacheElements();
-            App.showInitScreen();
-            App.bindEvents();
-        },
-
-        // Création de variables 'alias' pour manipuler la page
-        cacheElements: function() {
+            // Création de variables 'alias' pour manipuler la page
             App.$doc = $(document);
             App.$gameArea = $('#gameArea');
-        },
 
+            // Affichage de l'écran d'accueil
+            App.$gameArea.load("/partials/home.htm");
 
-        // Ajout d'events pour les boutons de l'écran d'accueil
-        bindEvents: function() {
-            // Trap
+            // Ajout d'events pour les boutons de l'écran d'accueil
             App.$doc.on('click', '#btnCreateGame', App.Trap.onCreateClick);
-            // Cat
             App.$doc.on('click', '#btnJoinGame', App.Cat.onJoinClick);
         },
 
-        /* *************************************
-         *             Game Logic              *
-         * *********************************** */
-
-        // Ecran d'accueil
-        showInitScreen: function() {
-            App.$gameArea.load("/partials/intro-screen.htm");
-        },
-
+        // Variable utilisée comme namespace. Regroupe le code concernant le poseur de piège (serveur)
         Trap : {
 
             // Référence vers le joueur chat
             cat: '',
 
-            // Handler. Le bouton 'START' sur l'écran d'accueil a été cliqué
+            // Handler. Le bouton 'CREATE' sur l'écran d'accueil a été cliqué
             onCreateClick: function() {
                 debug_log('[CREATE NEW GAME : 1/5] - Trap.onCreateClick (button event handler)');
                 IO.socket.emit('hostCreateNewGame');
             },
 
-            // Handler. L'écran du serveur (Trap) est affiché pour la première fois.
-            gameInit: function (data) {
+            // Handler. L'écran d'attente du serveur est affiché.
+            displayWaitingScreen: function (data) {
                 debug_log('[CREATE NEW GAME : 4/5] - Trap.gameInit (initialize variables)');
                 App.mySocketId = data.mySocketId;
+
+                App.$gameArea.load("/partials/waiting-create-game.htm");
+
+                // Définition du rôle adopté (Trap)
                 App.myRole = 'Trap';
-
-                App.Trap.displayNewGameScreen();
-            },
-
-            // Affichage de l'écran d'attente côté serveur
-            displayNewGameScreen : function() {
-                debug_log('[CREATE NEW GAME : 5/5] - Trap.displayNewGameScreen (change HTML body)');
-       
-                App.$gameArea.load("/partials/create-game.htm");
             },
 
             // Affichage de l'écran de jeu du poseur de piège
             gameCreateMap : function() {
-        
-                // Prepare the game screen with new HTML
-                App.$gameArea.load("/partials/host-game.htm", function() {
+                
+                // Charge le fichier de template de l'écran de jeu principal
+                // et génère la grille de jeu dynamiquement
+                App.$gameArea.load("/partials/game-host-screen.htm", function() {
                     var btnArea = document.getElementById('btnArea');
                     var btnRow;
                     var btn;
 
-                    //Create 11 div
+                    // Créé 11 div pour la grille de jeu
                     for(var i = 0; i < 11; i++) {  
                         btnRow = document.createElement('div');
                         btnRow.id = "btnRow_"+i;
                         if (i % 2 == 0) {
                             btnRow.className = 'line-offset';
                         }
-                        //Create 11 button for current div
+                        // Créé 11 boutons pour la ligne de la grille courante
                         for(var j = 0; j < 11; j++) {
                             btn = document.createElement('button');
                             btn.id = "btn_"+i+'_'+j;
                             btn.className = "btn btn-success ctm-btn-circle";
-                            //closure pour ajouter event sur chaque bouton
+                            // Closure pour ajouter event sur chaque bouton
                             btn.onclick = (function(thisBtn) {
                                 return function() {
                                     thisBtn.className = "btn ctm-btn-trap ctm-btn-circle";
@@ -170,39 +130,41 @@ jQuery(function($){
             }
         },
 
+        // Variable utilisée comme namespace. Regroupe le code concernant le chat (client)
         Cat : {
 
             // Référence vers la socket ID du serveur (Trap)
             hostSocketId: '',
 
-            // Handler. Le bouton 'JOIN' a été cliqué
+            // Handler. Le bouton 'JOIN' a été cliqué, l'écran d'attente du chat est affiché.
             onJoinClick: function () {
                 debug_log('[JOIN GAME : 1/2] - Cat.onJoinClick (button event handler)');
 
                 // Display the Join Game HTML on the player's screen.    
-                App.$gameArea.load("/partials/join-game.htm");
+                App.$gameArea.load("/partials/waiting-join-game.htm");
 
                 // Send the gameId and playerName to the server
                 IO.socket.emit('playerJoinGame');
 
-                // Set the appropriate properties for the current player.
+                // Définition du rôle adopté (Chat)
                 App.myRole = 'Cat';
             },
 
             // Affichage de l'écran de jeu du chat
             gameCreateMap : function(hostData) {
                 App.Cat.hostSocketId = hostData.mySocketId;
-                App.$gameArea.load("/partials/cat-screen.htm");
+                App.$gameArea.load("/partials/game-cat-screen.htm");
             }
         }
     };
 
+    // Appel des fonctions d'initialisation au chargement de la page
     IO.init();
     App.init();
 
 }($));
 
-// For debug
+// Pour debug
 var debugmode = true;
 function debug_log(string) {
     if(debugmode == true) {

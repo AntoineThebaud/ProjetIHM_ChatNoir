@@ -20,28 +20,25 @@ exports.initGame = function(sio, socket) {
 }
 
 /*******************************
- *       HOST FUNCTIONS        *
+ *       FONCTIONS HOST        *
  *******************************/
 
+// Un joueur a rejoint la file d'attente en tant que poseur de piège.
+// Si le chat est prêt, la partie est lancée.
 function hostCreateNewGame() {
-
 	debug_log('[CREATE NEW GAME : 2/5] - hostCreateNewGame (processing event server side)');
 
-    // Return the Room ID (gameId) and the socket ID (mySocketId) to the browser client
+    // Retourne l'id de la socket au côté client
     this.emit('newGameCreated', {mySocketId: this.id});
 
     serverReady = true;
     if (serverReady == true && catReady == true) {
-        //la partie peut être lancée.
-        console.log('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA');
         hostRoomFull();
     }
 };
 
-/*
- * Two players have joined. Alert the host!
- * @param gameId The game ID / room ID
- */
+// Le serveur (Trap) et le client (Cat) sont prêts
+// La partie peut être lancée
 function hostRoomFull() {
     debug_log('[START GAME : 1/2] - hostRoomFull');
 
@@ -54,18 +51,12 @@ function hostRoomFull() {
 }
 
 /********************************
- *       PLAYER FUNCTIONS       *
+ *       FONCTIONS CLIENT       *
  *******************************/
 
-/**
- * A player clicked the 'START GAME' button.
- * Attempt to connect them to the room that matches
- * the gameId entered by the player.
- * @param data Contains data entered via player's input - playerName and gameId.
- */
-
- //TODO : à virer ?
-function playerJoinGame() {
+// Un joueur a rejoint la file d'attente en tant que chat
+// Si le poseur de piège est prêt, la partie est lancée.
+function clientJoinGame() {
     debug_log('[JOIN GAME : 2/2] - playerJoinGame()');
 
     catReady = true;
@@ -76,7 +67,7 @@ function playerJoinGame() {
     }
 }
 
-// For debug
+// Pour debug
 var debugmode = true;
 function debug_log(string) {
     if(debugmode == true) {
