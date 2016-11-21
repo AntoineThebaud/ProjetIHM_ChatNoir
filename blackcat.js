@@ -1,5 +1,7 @@
 var io;
 var gameSocket;
+var serverReady;
+var catReady;
 
 exports.initGame = function(sio, socket) {
 	debug_log('initGame');
@@ -11,6 +13,10 @@ exports.initGame = function(sio, socket) {
     gameSocket.on('hostCreateNewGame', hostCreateNewGame);
     gameSocket.on('hostRoomFull', hostRoomFull);
     gameSocket.on('playerJoinGame', playerJoinGame);
+
+    // Initilisation des variables de controle pour le lancement de la partie
+    serverReady = false;
+    catReady = false;
 }
 
 /*******************************
@@ -24,8 +30,12 @@ function hostCreateNewGame() {
     // Return the Room ID (gameId) and the socket ID (mySocketId) to the browser client
     this.emit('newGameCreated', {mySocketId: this.id});
 
-    // Join the Room and wait for the players
-    this.join();
+    serverReady = true;
+    if (serverReady == true && catReady == true) {
+        //la partie peut être lancée.
+        console.log('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA');
+        hostRoomFull();
+    }
 };
 
 /*
@@ -33,7 +43,7 @@ function hostCreateNewGame() {
  * @param gameId The game ID / room ID
  */
 function hostRoomFull() {
-    debug_log('[START GAME : 1/?] - hostRoomFull');
+    debug_log('[START GAME : 1/2] - hostRoomFull');
 
     var sock = this;
     var data = {
@@ -53,14 +63,17 @@ function hostRoomFull() {
  * the gameId entered by the player.
  * @param data Contains data entered via player's input - playerName and gameId.
  */
+
+ //TODO : à virer ?
 function playerJoinGame() {
-    debug_log('[JOIN NEW GAME : 3/3] - playerJoinGame()');
+    debug_log('[JOIN GAME : 2/2] - playerJoinGame()');
 
-    // A reference to the player's Socket.IO socket object
-    var sock = this;
-
-    // TODO : mettre un commentaire qui va bien, wesh
-    io.sockets.emit('playerJoinedRoom');
+    catReady = true;
+    if (serverReady == true && catReady == true) {
+        //la partie peut être lancée.
+        console.log('ma grosse bite en platre');
+        hostRoomFull();
+    }
 }
 
 // For debug
