@@ -12,7 +12,7 @@ exports.initGame = function(sio, socket) {
     // Events
     gameSocket.on('hostCreateNewGame', hostCreateNewGame);
     gameSocket.on('hostRoomFull', hostRoomFull);
-    gameSocket.on('playerJoinGame', playerJoinGame);
+    gameSocket.on('clientJoinGame', clientJoinGame);
 
     // Initilisation des variables de controle pour le lancement de la partie
     serverReady = false;
@@ -62,7 +62,6 @@ function clientJoinGame() {
     catReady = true;
     if (serverReady == true && catReady == true) {
         //la partie peut être lancée.
-        console.log('ma grosse bite en platre');
         hostRoomFull();
     }
 }

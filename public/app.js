@@ -38,7 +38,7 @@ jQuery(function($){
             App[App.myRole].gameCreateMap(data);
         },
 
-        // handler. Popup d'erreur
+        // Handler. Popup d'erreur
         error : function(data) {
             alert(data.message);
         }
@@ -66,7 +66,7 @@ jQuery(function($){
             // Affichage de l'écran d'accueil
             App.$gameArea.load("/partials/home.htm");
 
-            // Ajout d'events pour les boutons de l'écran d'accueil
+            // Ajout d'events pour les boutons de l'écran d'accueil            
             App.$doc.on('click', '#btnCreateGame', App.Trap.onCreateClick);
             App.$doc.on('click', '#btnJoinGame', App.Cat.onJoinClick);
         },
@@ -116,7 +116,8 @@ jQuery(function($){
                             btn = document.createElement('button');
                             btn.id = "btn_"+i+'_'+j;
                             btn.className = "btn btn-success ctm-btn-circle";
-                            // Closure pour ajouter event sur chaque bouton
+                            // Closure pour ajouter un handler sur chaque bouton
+                            // Un bouton cliqué est vérouillé
                             btn.onclick = (function(thisBtn) {
                                 return function() {
                                     thisBtn.className = "btn ctm-btn-trap ctm-btn-circle";
@@ -144,7 +145,7 @@ jQuery(function($){
                 App.$gameArea.load("/partials/waiting-join-game.htm");
 
                 // Send the gameId and playerName to the server
-                IO.socket.emit('playerJoinGame');
+                IO.socket.emit('clientJoinGame');
 
                 // Définition du rôle adopté (Chat)
                 App.myRole = 'Cat';
@@ -153,7 +154,31 @@ jQuery(function($){
             // Affichage de l'écran de jeu du chat
             gameCreateMap : function(hostData) {
                 App.Cat.hostSocketId = hostData.mySocketId;
-                App.$gameArea.load("/partials/game-cat-screen.htm");
+                App.$gameArea.load("/partials/game-cat-screen.htm", function() {
+                    // Ajout de handlers sur les boutons           
+                    App.$doc.on('click', '#btn_topleft', function(){ 
+                        App.Cat.onMoveButton("btn_topleft");
+                    });
+                    App.$doc.on('click', '#btn_topright', function(){ 
+                        App.Cat.onMoveButton("btn_topright");
+                    });
+                    App.$doc.on('click', '#btn_left', function(){ 
+                        App.Cat.onMoveButton("btn_left");
+                    });
+                    App.$doc.on('click', '#btn_right', function(){ 
+                        App.Cat.onMoveButton("btn_right");
+                    });
+                    App.$doc.on('click', '#btn_botleft', function(){ 
+                        App.Cat.onMoveButton("btn_botleft");
+                    });
+                    App.$doc.on('click', '#btn_botright', function(){ 
+                        App.Cat.onMoveButton("btn_botright");
+                    });
+                });                
+            },
+
+            onMoveButton: function(direction) {
+                console.log("Yolo swag : " + direction);
             }
         }
     };
