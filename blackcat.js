@@ -59,6 +59,7 @@ function hostRoomFull() {
 // Move cat left
 function catMoved(data) {
 	debug_log('[Cat Mouvement] - Cat moved ' + data.direction);
+	io.sockets.emit('catMoved', data);
 };
 
 /********************************

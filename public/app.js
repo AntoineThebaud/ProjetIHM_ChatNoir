@@ -15,6 +15,11 @@ jQuery(function($){
             IO.socket.on('newGameCreated', IO.onNewGameCreated );
             IO.socket.on('beginNewGame', IO.beginNewGame );
             IO.socket.on('error', IO.error );
+            IO.socket.on('catMoved', IO.catMoved );
+        },
+
+        catMoved : function(data) {
+          App.Trap.catMoved(data);
         },
 
         // Handler. Connexion établie
@@ -134,6 +139,11 @@ jQuery(function($){
                     // Initialisation du chat (au milieu de la map)
                     $('#btn_5_5').attr('class', 'btn btn-danger ctm-btn-circle');
                 });
+            },
+
+            catMoved : function(data) {
+              console.log('   debug  - [app.js] Cat move ' + data.direction);
+
             }
         },
 
