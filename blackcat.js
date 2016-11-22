@@ -18,6 +18,7 @@ exports.initGame = function(sio, socket) {
     gameSocket.on('hostCreateNewGame', hostCreateNewGame);
     gameSocket.on('hostRoomFull', hostRoomFull);
     gameSocket.on('clientJoinGame', clientJoinGame);
+		gameSocket.on('catMoved', catMoved);
 
     // Initilisation des variables de controle
     serverReady = false;
@@ -54,6 +55,11 @@ function hostRoomFull() {
 
     io.sockets.emit('beginNewGame', data);
 }
+
+// Move cat left
+function catMoved(data) {
+	debug_log('[Cat Mouvement] - Cat moved ' + data.direction);
+};
 
 /********************************
  *       FONCTIONS CLIENT       *

@@ -185,6 +185,7 @@ jQuery(function($){
 
             onMoveButton: function(direction) {
                 console.log("Yolo swag : " + direction);
+                IO.socket.emit('catMoved', {'direction': direction});
                 // TODO : emettre un event à blackcat.js
             }
         }
