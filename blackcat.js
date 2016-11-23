@@ -35,7 +35,7 @@ exports.initGame = function(sio, socket) {
 
     // Création de la grille
     grid = new Array(11);
-    for (var i = 0; i < 10; i++) {
+    for (var i = 0; i < 11; i++) {
       grid[i] = new Array(11);
     }
 }
@@ -96,13 +96,21 @@ function isCatNear(position) {
     else if(position.x == catPosition.i && position.y == catPosition.j+1) {
         return "btn_right";
     }
-    //piège posé en bas à gauche du chat
-    else if(position.x == catPosition.i && position.y == catPosition.j+1) {
-        return "btn_right";
+    //piège posé en haut à droite du chat
+    else if(position.x == catPosition.i-1 && position.y == catPosition.j + catPosition.i%2 ) {
+        return "btn_topright";
+    }
+    //piège posé en haut à gauche du chat
+    else if(position.x == catPosition.i-1 && position.y == catPosition.j - (catPosition.i+1)%2) {
+        return "btn_topleft";
     }
     //piège posé en bas à droite du chat
-    else if(position.x == catPosition.i && position.y == catPosition.j+1) {
-        return "btn_right";
+    else if(position.x == catPosition.i+1 && position.y == catPosition.j + catPosition.i%2) {
+        return "btn_botright";
+    }
+    //piège posé en bas à gauche du chat
+    else if(position.x == catPosition.i+1 && position.y == catPosition.j - (catPosition.i+1)%2) {
+        return "btn_botleft";
     }
 }
 
@@ -116,6 +124,7 @@ var pos = {
 		j : ''
 	}
 }
+
 // Move cat left
 function catMoved(data) {
 	pos.old.i = catPosition.i;
