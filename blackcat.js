@@ -23,13 +23,14 @@ exports.initGame = function(sio, socket) {
     gameSocket.on('hostTrapRequest', hostTrapRequest);
     gameSocket.on('clientJoinGame', clientJoinGame);
     gameSocket.on('clientMoveRequest', clientMoveRequest);
+    gameSocket.on('catMoved', catMoved);
 
     // Initilisation des variables de controle
     serverReady = false;
     catReady = false;
     catPosition = {
-        x: 5,
-        y: 5
+        i : 5,
+        j : 5
     };
 
     // Création de la grille
@@ -85,24 +86,67 @@ function hostTrapRequest(position) {
 
 function isCatNear(position) {
     debug_log('position = ['+position.x+';'+position.y+']');
-    debug_log('catPosition = ['+catPosition.x+';'+catPosition.y+']');
+    debug_log('catPosition = ['+catPosition.i+';'+catPosition.j+']');
 
     //piège posé à gauche du chat
-    if(position.x == catPosition.x && position.y == catPosition.y-1) {
+    if(position.x == catPosition.i && position.y == catPosition.j-1) {
         return "btn_left";
     }
     //piège posé à droite du chat
-    else if(position.x == catPosition.x && position.y == catPosition.y+1) {
+    else if(position.x == catPosition.i && position.y == catPosition.j+1) {
         return "btn_right";
     }
     //piège posé en bas à gauche du chat
-    else if(position.x == catPosition.x && position.y == catPosition.y+1) {
+    else if(position.x == catPosition.i && position.y == catPosition.j+1) {
         return "btn_right";
     }
     //piège posé en bas à droite du chat
-    else if(position.x == catPosition.x && position.y == catPosition.y+1) {
+    else if(position.x == catPosition.i && position.y == catPosition.j+1) {
         return "btn_right";
     }
+}
+
+var pos = {
+	old : {
+		i : '',
+		j : ''
+	},
+	neww : {
+		i : '',
+		j : ''
+	}
+}
+// Move cat left
+function catMoved(data) {
+	pos.old.i = catPosition.i;
+	pos.old.j = catPosition.j;
+	debug_log('[Cat Mouvement] - Cat moved ' + data.direction);
+	catPosition = nextCatPosition(catPosition,data.direction);
+	pos.neww.i = catPosition.i;
+	pos.neww.j = catPosition.j;
+	io.sockets.emit('catMoved', pos)	;
+};
+
+function nextCatPosition(position, direction) {
+	if (direction == 'left') {
+		position.j--;
+	} else if (direction == 'right') {
+		position.j++;
+	} else if (direction == 'topleft') {
+		position.j = position.j - 1 + position.i%2;
+		position.i--;
+	} else if (direction == 'topright') {
+		position.j = position.j + position.i%2;
+		position.i--;
+	} else if (direction == 'botleft') {
+		position.j = position.j - 1 + position.i%2;
+		position.i++;
+	} else if (direction == 'botright') {
+		position.j = position.j + position.i%2;
+		position.i++;
+	}
+	console.log(direction + ' > ' + position.i + ' ' + position.j);
+	return position;
 }
 
 /********************************

@@ -17,6 +17,11 @@ jQuery(function($){
             IO.socket.on('trapPlaced', IO.trapPlaced );
             IO.socket.on('directionForbidden', IO.directionForbidden);
             IO.socket.on('error', IO.error );
+            IO.socket.on('catMoved', IO.catMoved );
+        },
+
+        catMoved : function(mouvement) {
+          App[App.myRole].catMoved(mouvement);
         },
 
         // Handler. Connexion établie
@@ -149,12 +154,33 @@ jQuery(function($){
                     }
 
                     // Initialisation du chat (au milieu de la map)
-                    $('#btn_5_5').attr('class', 'btn btn-danger ctm-btn-circle');
+                    //$('#btn_5_5').attr('class', 'btn btn-danger ctm-btn-circle');
+                    App.Trap.placerPiege(5,5);
+
                 });
             },
 
             gameDisplayTrap: function(data) {
                 $('#btn_'+data.x+'_'+data.y).attr('class', 'btn ctm-btn-trap ctm-btn-circle');
+            },
+
+            placerPiege: function(i,j) {
+              $('#btn_'+i+'_'+j).attr('class', 'btn btn-danger ctm-btn-circle');
+            },
+
+            placerChat: function(i,j, i2, j2) {
+              $('#btn_'+i+'_'+j).attr('class', 'btn btn-success ctm-btn-circle');
+              $('#btn_'+i2+'_'+j2).attr('class', 'btn btn-danger ctm-btn-circle');
+            },
+
+            // réception du mouvement du chat coté trap
+            catMoved : function(data) {
+              App.Trap.placerChat(
+                data.old.i,
+                data.old.j,
+                data.neww.i,
+                data.neww.j
+              );
             }
         },
 
@@ -182,25 +208,24 @@ jQuery(function($){
             gameCreateMap: function(hostData) {
                 App.Cat.hostSocketId = hostData.mySocketId;
                 App.$gameArea.load("/partials/game-cat-screen.htm", function() {
-                    // Ajout de handlers sur les boutons           
-                    App.$doc.on('click', '#btn_topleft', function() { 
-                        App.Cat.onMoveButton("btn_topleft");
-                        IO.socket.emit("clientMoveRequest", "btn_topleft");
+                    // Ajout de handlers sur les boutons
+                    App.$doc.on('click', '#btn_topleft', function(){
+                        App.Cat.onMoveButton("topleft");
                     });
-                    App.$doc.on('click', '#btn_topright', function() { 
-                        App.Cat.onMoveButton("btn_topright");
+                    App.$doc.on('click', '#btn_topright', function(){
+                        App.Cat.onMoveButton("topright");
                     });
-                    App.$doc.on('click', '#btn_left', function() { 
-                        App.Cat.onMoveButton("btn_left");
+                    App.$doc.on('click', '#btn_left', function(){
+                        App.Cat.onMoveButton("left");
                     });
-                    App.$doc.on('click', '#btn_right', function() { 
-                        App.Cat.onMoveButton("btn_right");
+                    App.$doc.on('click', '#btn_right', function(){
+                        App.Cat.onMoveButton("right");
                     });
-                    App.$doc.on('click', '#btn_botleft', function() { 
-                        App.Cat.onMoveButton("btn_botleft");
+                    App.$doc.on('click', '#btn_botleft', function(){
+                        App.Cat.onMoveButton("botleft");
                     });
-                    App.$doc.on('click', '#btn_botright', function() { 
-                        App.Cat.onMoveButton("btn_botright");
+                    App.$doc.on('click', '#btn_botright', function(){
+                        App.Cat.onMoveButton("botright");
                     });
                 });                
             },
@@ -212,8 +237,14 @@ jQuery(function($){
 
             onMoveButton: function(direction) {
                 console.log("Yolo swag : " + direction);
+                IO.socket.emit('catMoved', {'direction': direction});
                 // TODO : emettre un event à blackcat.js
+            },
+
+            catMoved : function(data) {
+              //console.log('   debug  - [app.js] Cat: Cat move ' + data.direction);
             }
+
         }
     };
 
