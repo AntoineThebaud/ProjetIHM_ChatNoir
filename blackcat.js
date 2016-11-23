@@ -6,7 +6,7 @@ var serverReady;
 var catReady;
 
 // garde en mémoire la position du chat
-var catPosition;
+var catPosition = [];
 
 exports.initGame = function(sio, socket) {
 	debug_log('initGame');
@@ -17,11 +17,17 @@ exports.initGame = function(sio, socket) {
     // Events
     gameSocket.on('hostCreateNewGame', hostCreateNewGame);
     gameSocket.on('hostRoomFull', hostRoomFull);
+    gameSocket.on('hostTrapRequest', hostTrapRequest);
     gameSocket.on('clientJoinGame', clientJoinGame);
+    gameSocket.on('clientMoveRequest', clientMoveRequest);
 
     // Initilisation des variables de controle
     serverReady = false;
     catReady = false;
+/*    catPosition = {
+        x = 5,
+        y = 5
+    };*/
 }
 
 /*******************************
@@ -55,6 +61,12 @@ function hostRoomFull() {
     io.sockets.emit('beginNewGame', data);
 }
 
+// Le poseur de piège a cliqué sur une case pour poser un piège
+function hostTrapRequest(position) {
+    debug_log('[BLABLABLABLA : 2/?] - hostTrapRequest('+position+')');
+    //TODO
+}
+
 /********************************
  *       FONCTIONS CLIENT       *
  *******************************/
@@ -62,13 +74,24 @@ function hostRoomFull() {
 // Un joueur a rejoint la file d'attente en tant que chat
 // Si le poseur de piège est prêt, la partie est lancée.
 function clientJoinGame() {
-    debug_log('[JOIN GAME : 2/2] - playerJoinGame()');
+    debug_log('[JOIN GAME : 2/2] - clientJoinGame()');
 
     catReady = true;
     if (serverReady == true && catReady == true) {
         //la partie peut être lancée.
         hostRoomFull();
     }
+}
+
+// Le joueur chat a cliqué sur l'un des boutons directionnels
+// TODO : tester si la direction choisie est valide
+// TODO : tester si la direction choisie déclenche la victoire du chat
+function clientMoveRequest(direction) {
+    debug_log('[BLABLABLABLA : 2/?] - clientMoveRequest()');
+
+/*    switch(direction) {
+        case "btn_topleft":
+    }*/
 }
 
 // Pour debug
