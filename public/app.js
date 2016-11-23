@@ -18,8 +18,8 @@ jQuery(function($){
             IO.socket.on('catMoved', IO.catMoved );
         },
 
-        catMoved : function(data) {
-          App.Trap.catMoved(data);
+        catMoved : function(mouvement) {
+          App[App.myRole].catMoved(mouvement);
         },
 
         // Handler. Connexion établie
@@ -142,8 +142,7 @@ jQuery(function($){
             },
 
             catMoved : function(data) {
-              console.log('   debug  - [app.js] Cat move ' + data.direction);
-
+              console.log('   debug  - [app.js] Trap: Cat move ' + data.direction);
             }
         },
 
@@ -197,6 +196,10 @@ jQuery(function($){
                 console.log("Yolo swag : " + direction);
                 IO.socket.emit('catMoved', {'direction': direction});
                 // TODO : emettre un event à blackcat.js
+            },
+
+            catMoved : function(data) {
+              console.log('   debug  - [app.js] Cat: Cat move ' + data.direction);
             }
         }
     };
