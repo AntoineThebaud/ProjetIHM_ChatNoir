@@ -137,12 +137,26 @@ jQuery(function($){
                     }
 
                     // Initialisation du chat (au milieu de la map)
-                    $('#btn_5_5').attr('class', 'btn btn-danger ctm-btn-circle');
+                    //$('#btn_5_5').attr('class', 'btn btn-danger ctm-btn-circle');
+                    App.Trap.placerPiege(5,5);
+
                 });
             },
 
+            placerPiege: function(i,j) {
+              $('#btn_'+i+'_'+j).attr('class', 'btn btn-danger ctm-btn-circle');
+            },
+
+            placerChat: function(i,j, i2, j2) {
+              $('#btn_'+i+'_'+j).attr('class', 'btn btn-success ctm-btn-circle');
+              $('#btn_'+i2+'_'+j2).attr('class', 'btn btn-danger ctm-btn-circle');
+            },
+
+            // réception du mouvement du chat coté trap
             catMoved : function(data) {
               console.log('   debug  - [app.js] Trap: Cat move ' + data.direction);
+
+              App.Trap.placerChat(5,5,4,5);
             }
         },
 
