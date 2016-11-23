@@ -6,7 +6,10 @@ var serverReady;
 var catReady;
 
 // garde en mémoire la position du chat
-var catPosition = [];
+var catPosition;
+
+// variable qui stocke l'état de la grille de jeu
+var grid;
 
 exports.initGame = function(sio, socket) {
 	debug_log('initGame');
@@ -24,10 +27,16 @@ exports.initGame = function(sio, socket) {
     // Initilisation des variables de controle
     serverReady = false;
     catReady = false;
-/*    catPosition = {
-        x = 5,
-        y = 5
-    };*/
+    catPosition = {
+        x: 5,
+        y: 5
+    };
+
+    // Création de la grille
+    grid = new Array(11);
+    for (var i = 0; i < 10; i++) {
+      grid[i] = new Array(11);
+    }
 }
 
 /*******************************
@@ -63,8 +72,37 @@ function hostRoomFull() {
 
 // Le poseur de piège a cliqué sur une case pour poser un piège
 function hostTrapRequest(position) {
-    debug_log('[BLABLABLABLA : 2/?] - hostTrapRequest('+position+')');
-    //TODO
+    debug_log('[BLABLABLABLA : 2/?] - hostTrapRequest('+position.x+';'+position.y+')');
+    //TODO 
+    grid[position.x][position.y] = "trap";
+    io.sockets.emit('trapPlaced', position);
+    //TODO : si le chat est adjacent, mettre à jour sa carte
+    var near = isCatNear(position);
+    if (near != null) {
+        io.sockets.emit('directionForbidden', near);
+    }
+}
+
+function isCatNear(position) {
+    debug_log('position = ['+position.x+';'+position.y+']');
+    debug_log('catPosition = ['+catPosition.x+';'+catPosition.y+']');
+
+    //piège posé à gauche du chat
+    if(position.x == catPosition.x && position.y == catPosition.y-1) {
+        return "btn_left";
+    }
+    //piège posé à droite du chat
+    else if(position.x == catPosition.x && position.y == catPosition.y+1) {
+        return "btn_right";
+    }
+    //piège posé en bas à gauche du chat
+    else if(position.x == catPosition.x && position.y == catPosition.y+1) {
+        return "btn_right";
+    }
+    //piège posé en bas à droite du chat
+    else if(position.x == catPosition.x && position.y == catPosition.y+1) {
+        return "btn_right";
+    }
 }
 
 /********************************

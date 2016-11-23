@@ -14,6 +14,8 @@ jQuery(function($){
             IO.socket.on('connected', IO.onConnected );
             IO.socket.on('newGameCreated', IO.onNewGameCreated );
             IO.socket.on('beginNewGame', IO.beginNewGame );
+            IO.socket.on('trapPlaced', IO.trapPlaced );
+            IO.socket.on('directionForbidden', IO.directionForbidden);
             IO.socket.on('error', IO.error );
         },
 
@@ -36,6 +38,16 @@ jQuery(function($){
             // Il y a 2 versions pour cette fonction (Trap & Cat)
             // Chaque appareil appelle la fonction qui correspond à son role
             App[App.myRole].gameCreateMap(data);
+        },
+
+        // Handler. Un piège a été posé
+        trapPlaced: function(data) {
+            App.Trap.gameDisplayTrap(data);
+        },
+
+        directionForbidden: function(direction) {
+            debug_log('directionForbidden ('+direction+')');
+            App.Cat.gameLockButton(direction);
         },
 
         // Handler. Popup d'erreur
@@ -118,15 +130,19 @@ jQuery(function($){
                             btn.className = "btn btn-success ctm-btn-circle";
                             // Closure pour ajouter un handler sur chaque bouton
                             // Un bouton cliqué est vérouillé
-                            btn.onclick = (function(thisBtn) {
+                            btn.onclick = (function(x, y) {
                                 return function() {
                                     // thisBtn.className = "btn ctm-btn-trap ctm-btn-circle";
                                     // TODO : emettre un event à blackcat.js
                                     // c'est blackcat.js qui se charge de gérer la partie,
                                     // de tester si le chat est bloqué etc..
-                                    IO.socket.emit('hostTrapRequest', thisBtn.id);
+                                    var data = {
+                                        x : x,
+                                        y : y
+                                    }
+                                    IO.socket.emit('hostTrapRequest', data);
                                 };
-                            })(btn);
+                            })(i, j);
                             btnRow.appendChild(btn);
                         }
                         btnArea.appendChild(btnRow);
@@ -135,6 +151,10 @@ jQuery(function($){
                     // Initialisation du chat (au milieu de la map)
                     $('#btn_5_5').attr('class', 'btn btn-danger ctm-btn-circle');
                 });
+            },
+
+            gameDisplayTrap: function(data) {
+                $('#btn_'+data.x+'_'+data.y).attr('class', 'btn ctm-btn-trap ctm-btn-circle');
             }
         },
 
@@ -159,7 +179,7 @@ jQuery(function($){
             },
 
             // Affichage de l'écran de jeu du chat
-            gameCreateMap : function(hostData) {
+            gameCreateMap: function(hostData) {
                 App.Cat.hostSocketId = hostData.mySocketId;
                 App.$gameArea.load("/partials/game-cat-screen.htm", function() {
                     // Ajout de handlers sur les boutons           
@@ -183,6 +203,11 @@ jQuery(function($){
                         App.Cat.onMoveButton("btn_botright");
                     });
                 });                
+            },
+
+            gameLockButton: function(direction) {
+                debug_log('[BLABLABLABLA : 2/?] - gameLockButton('+direction+')');
+                $('#'+direction).prop('disabled', true);
             },
 
             onMoveButton: function(direction) {
