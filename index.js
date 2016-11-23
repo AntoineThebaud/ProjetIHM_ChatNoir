@@ -21,3 +21,5 @@ io.sockets.on('connection', function (socket) {
     console.log('    LOG  - [index.js] client connected');
     game.initGame(io, socket);
 });
+
+console.log('   DEBUG   - [index.js] Server start on port: ' + port);
