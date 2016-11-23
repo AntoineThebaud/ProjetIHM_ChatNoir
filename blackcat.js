@@ -6,7 +6,10 @@ var serverReady;
 var catReady;
 
 // garde en mémoire la position du chat
-var catPosition;
+var catPosition = {
+	i : 5,
+	j : 5
+};
 
 exports.initGame = function(sio, socket) {
 	debug_log('initGame');
@@ -56,11 +59,48 @@ function hostRoomFull() {
     io.sockets.emit('beginNewGame', data);
 }
 
+var pos = {
+	old : {
+		i : '',
+		j : ''
+	},
+	neww : {
+		i : '',
+		j : ''
+	}
+}
 // Move cat left
 function catMoved(data) {
+	pos.old.i = catPosition.i;
+	pos.old.j = catPosition.j;
 	debug_log('[Cat Mouvement] - Cat moved ' + data.direction);
-	io.sockets.emit('catMoved', data);
+	catPosition = nextCatPosition(catPosition,data.direction);
+	pos.neww.i = catPosition.i;
+	pos.neww.j = catPosition.j;
+	io.sockets.emit('catMoved', pos)	;
 };
+
+function nextCatPosition(position, direction) {
+	if (direction == 'left') {
+		position.j--;
+	} else if (direction == 'right') {
+		position.j++;
+	} else if (direction == 'topleft') {
+		position.j = position.j - 1 + position.i%2;
+		position.i--;
+	} else if (direction == 'topright') {
+		position.j = position.j + position.i%2;
+		position.i--;
+	} else if (direction == 'botleft') {
+		position.j = position.j - 1 + position.i%2;
+		position.i++;
+	} else if (direction == 'botright') {
+		position.j = position.j + position.i%2;
+		position.i++;
+	}
+	console.log(direction + ' > ' + position.i + ' ' + position.j);
+	return position;
+}
 
 /********************************
  *       FONCTIONS CLIENT       *

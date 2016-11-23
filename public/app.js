@@ -154,9 +154,12 @@ jQuery(function($){
 
             // réception du mouvement du chat coté trap
             catMoved : function(data) {
-              console.log('   debug  - [app.js] Trap: Cat move ' + data.direction);
-
-              App.Trap.placerChat(5,5,4,5);
+              App.Trap.placerChat(
+                data.old.i,
+                data.old.j,
+                data.neww.i,
+                data.neww.j
+              );
             }
         },
 
@@ -184,24 +187,25 @@ jQuery(function($){
             gameCreateMap : function(hostData) {
                 App.Cat.hostSocketId = hostData.mySocketId;
                 App.$gameArea.load("/partials/game-cat-screen.htm", function() {
-                    // Ajout de handlers sur les boutons           
-                    App.$doc.on('click', '#btn_topleft', function(){ 
-                        App.Cat.onMoveButton("btn_topleft");
+
+                    // Ajout de handlers sur les boutons
+                    App.$doc.on('click', '#btn_topleft', function(){
+                        App.Cat.onMoveButton("topleft");
                     });
-                    App.$doc.on('click', '#btn_topright', function(){ 
-                        App.Cat.onMoveButton("btn_topright");
+                    App.$doc.on('click', '#btn_topright', function(){
+                        App.Cat.onMoveButton("topright");
                     });
-                    App.$doc.on('click', '#btn_left', function(){ 
-                        App.Cat.onMoveButton("btn_left");
+                    App.$doc.on('click', '#btn_left', function(){
+                        App.Cat.onMoveButton("left");
                     });
-                    App.$doc.on('click', '#btn_right', function(){ 
-                        App.Cat.onMoveButton("btn_right");
+                    App.$doc.on('click', '#btn_right', function(){
+                        App.Cat.onMoveButton("right");
                     });
-                    App.$doc.on('click', '#btn_botleft', function(){ 
-                        App.Cat.onMoveButton("btn_botleft");
+                    App.$doc.on('click', '#btn_botleft', function(){
+                        App.Cat.onMoveButton("botleft");
                     });
-                    App.$doc.on('click', '#btn_botright', function(){ 
-                        App.Cat.onMoveButton("btn_botright");
+                    App.$doc.on('click', '#btn_botright', function(){
+                        App.Cat.onMoveButton("botright");
                     });
                 });                
             },
@@ -213,8 +217,9 @@ jQuery(function($){
             },
 
             catMoved : function(data) {
-              console.log('   debug  - [app.js] Cat: Cat move ' + data.direction);
+              //console.log('   debug  - [app.js] Cat: Cat move ' + data.direction);
             }
+
         }
     };
 
