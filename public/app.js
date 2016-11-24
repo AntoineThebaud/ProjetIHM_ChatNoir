@@ -20,8 +20,8 @@ jQuery(function($){
             IO.socket.on('catMoved', IO.catMoved );
         },
 
-        catMoved : function(mouvement) {
-          App[App.myRole].catMoved(mouvement);
+        catMoved : function(data) {
+          App[App.myRole].catMoved(data);
         },
 
         // Handler. Connexion établie
@@ -176,10 +176,10 @@ jQuery(function($){
             // réception du mouvement du chat coté trap
             catMoved : function(data) {
               App.Trap.placerChat(
-                data.old.i,
-                data.old.j,
-                data.neww.i,
-                data.neww.j
+                data.pos.old.i,
+                data.pos.old.j,
+                data.pos.neww.i,
+                data.pos.neww.j
               );
             }
         },
@@ -236,15 +236,18 @@ jQuery(function($){
             },
 
             onMoveButton: function(direction) {
-                console.log("Yolo swag : " + direction);
-                IO.socket.emit('catMoved', {'direction': direction});
+                debug_log("Yolo swag : " + direction);
+                IO.socket.emit('catMoved', {'direction': direction });
                 // TODO : emettre un event à blackcat.js
             },
 
             catMoved : function(data) {
-              //console.log('   debug  - [app.js] Cat: Cat move ' + data.direction);
+                debug_log("data.traps = ")
+                debug_log(data.traps);
+                for (var elem in data.traps) {
+                    App.Cat.gameLockButton(data.traps[elem]);
+                }
             }
-
         }
     };
 

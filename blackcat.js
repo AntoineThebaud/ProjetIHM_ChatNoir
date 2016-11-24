@@ -22,7 +22,6 @@ exports.initGame = function(sio, socket) {
     gameSocket.on('hostRoomFull', hostRoomFull);
     gameSocket.on('hostTrapRequest', hostTrapRequest);
     gameSocket.on('clientJoinGame', clientJoinGame);
-    gameSocket.on('clientMoveRequest', clientMoveRequest);
     gameSocket.on('catMoved', catMoved);
 
     // Initilisation des variables de controle
@@ -114,50 +113,6 @@ function isCatNear(position) {
     }
 }
 
-var pos = {
-	old : {
-		i : '',
-		j : ''
-	},
-	neww : {
-		i : '',
-		j : ''
-	}
-}
-
-// Move cat left
-function catMoved(data) {
-	pos.old.i = catPosition.i;
-	pos.old.j = catPosition.j;
-	debug_log('[Cat Mouvement] - Cat moved ' + data.direction);
-	catPosition = nextCatPosition(catPosition,data.direction);
-	pos.neww.i = catPosition.i;
-	pos.neww.j = catPosition.j;
-	io.sockets.emit('catMoved', pos)	;
-};
-
-function nextCatPosition(position, direction) {
-	if (direction == 'left') {
-		position.j--;
-	} else if (direction == 'right') {
-		position.j++;
-	} else if (direction == 'topleft') {
-		position.j = position.j - 1 + position.i%2;
-		position.i--;
-	} else if (direction == 'topright') {
-		position.j = position.j + position.i%2;
-		position.i--;
-	} else if (direction == 'botleft') {
-		position.j = position.j - 1 + position.i%2;
-		position.i++;
-	} else if (direction == 'botright') {
-		position.j = position.j + position.i%2;
-		position.i++;
-	}
-	console.log(direction + ' > ' + position.i + ' ' + position.j);
-	return position;
-}
-
 /********************************
  *       FONCTIONS CLIENT       *
  *******************************/
@@ -174,15 +129,83 @@ function clientJoinGame() {
     }
 }
 
+var pos = {
+    old : {
+        i : '',
+        j : ''
+    },
+    neww : {
+        i : '',
+        j : ''
+    }
+}
+
 // Le joueur chat a cliqué sur l'un des boutons directionnels
 // TODO : tester si la direction choisie est valide
 // TODO : tester si la direction choisie déclenche la victoire du chat
-function clientMoveRequest(direction) {
-    debug_log('[BLABLABLABLA : 2/?] - clientMoveRequest()');
+function catMoved(data) {
+    pos.old.i = catPosition.i;
+    pos.old.j = catPosition.j;
+    debug_log('[Cat Mouvement] - Cat moved ' + data.direction);
+    catPosition = nextCatPosition(catPosition, data.direction);
+    pos.neww.i = catPosition.i;
+    pos.neww.j = catPosition.j;
+    var nearTraps = getNearTraps(pos.neww);
+    var data = {
+        pos: pos,
+        traps: nearTraps
+    }
+    io.sockets.emit('catMoved', data);
+};
 
-/*    switch(direction) {
-        case "btn_topleft":
-    }*/
+function nextCatPosition(position, direction) {
+    if (direction == 'left') {
+        position.j--;
+    } else if (direction == 'right') {
+        position.j++;
+    } else if (direction == 'topleft') {
+        position.j = position.j - 1 + position.i%2;
+        position.i--;
+    } else if (direction == 'topright') {
+        position.j = position.j + position.i%2;
+        position.i--;
+    } else if (direction == 'botleft') {
+        position.j = position.j - 1 + position.i%2;
+        position.i++;
+    } else if (direction == 'botright') {
+        position.j = position.j + position.i%2;
+        position.i++;
+    }
+    debug_log(direction + ' > ' + position.i + ' ' + position.j);
+    return position;
+}
+
+function getNearTraps(position) {
+    debug_log("grid =");
+    debug_log(grid);
+
+    var arrayTraps = [];
+   /* return ["btn_topleft", "btn_topright", "btn_right"];*/
+    debug_log("grid["+(position.i-1)+"]["+(position.j-1)+"] = " + grid[position.i-1][position.j-1]);
+    if(grid[position.i-1][position.j-(1-position.i%2)] == "trap") {
+        arrayTraps.push("btn_topleft");
+    }
+    if(grid[position.i-1][position.j+position.i%2] == "trap") {
+        arrayTraps.push("btn_topright");
+    }
+    if(grid[position.i][position.j-1] == "trap") {
+        arrayTraps.push("btn_left");
+    }
+    if(grid[position.i][position.j+1] == "trap") {
+        arrayTraps.push("btn_right");
+    }
+    if(grid[position.i+1][position.j-(1-position.i%2)] == "trap") {
+        arrayTraps.push("btn_botleft");
+    }
+    if(grid[position.i+1][position.j+position.i%2] == "trap") {
+        arrayTraps.push("btn_botright");
+    }
+    return arrayTraps;
 }
 
 // Pour debug
