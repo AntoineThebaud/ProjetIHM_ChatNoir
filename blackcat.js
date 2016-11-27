@@ -73,44 +73,62 @@ function hostRoomFull() {
 // Le poseur de piège a cliqué sur une case pour poser un piège
 function hostTrapRequest(position) {
     debug_log('[BLABLABLABLA : 2/?] - hostTrapRequest('+position.x+';'+position.y+')');
-    //TODO 
+
     grid[position.x][position.y] = "trap";
     io.sockets.emit('trapPlaced', position);
-    //TODO : si le chat est adjacent, mettre à jour sa carte
     var near = isCatNear(position);
     if (near != null) {
         io.sockets.emit('directionForbidden', near);
     }
+    // Test de victoire du poseur de piège
+    if (isCatTrapped()) {
+        debug_log("[trapWon]");
+        io.sockets.emit('trapWon');
+    }
 }
 
+// détermine si le piège venant d'être posé et à côté du chat
 function isCatNear(position) {
     debug_log('position = ['+position.x+';'+position.y+']');
     debug_log('catPosition = ['+catPosition.i+';'+catPosition.j+']');
 
+    //piège posé en haut à gauche du chat
+    if(position.x == catPosition.i-1 && position.y == catPosition.j - (catPosition.i+1)%2) {
+        return "btn_topleft";
+    }
+    //piège posé en haut à droite du chat
+    else if(position.x == catPosition.i-1 && position.y == catPosition.j + catPosition.i%2 ) {
+        return "btn_topright";
+    }
     //piège posé à gauche du chat
-    if(position.x == catPosition.i && position.y == catPosition.j-1) {
+    else if(position.x == catPosition.i && position.y == catPosition.j-1) {
         return "btn_left";
     }
     //piège posé à droite du chat
     else if(position.x == catPosition.i && position.y == catPosition.j+1) {
         return "btn_right";
     }
-    //piège posé en haut à droite du chat
-    else if(position.x == catPosition.i-1 && position.y == catPosition.j + catPosition.i%2 ) {
-        return "btn_topright";
-    }
-    //piège posé en haut à gauche du chat
-    else if(position.x == catPosition.i-1 && position.y == catPosition.j - (catPosition.i+1)%2) {
-        return "btn_topleft";
+    //piège posé en bas à gauche du chat
+    else if(position.x == catPosition.i+1 && position.y == catPosition.j - (catPosition.i+1)%2) {
+        return "btn_botleft";
     }
     //piège posé en bas à droite du chat
     else if(position.x == catPosition.i+1 && position.y == catPosition.j + catPosition.i%2) {
         return "btn_botright";
     }
-    //piège posé en bas à gauche du chat
-    else if(position.x == catPosition.i+1 && position.y == catPosition.j - (catPosition.i+1)%2) {
-        return "btn_botleft";
-    }
+}
+
+// détermine si le chat a perdu ou non
+function isCatTrapped() {
+    debug_log('[isCatTrapped]');
+
+    return ((grid[catPosition.i-1][catPosition.j - (catPosition.i+1)%2]  == "trap") // top left
+        &&  (grid[catPosition.i-1][catPosition.j + catPosition.i%2]      == "trap") // top right
+        &&  (grid[catPosition.i][catPosition.j-1]                        == "trap") // left
+        &&  (grid[catPosition.i][catPosition.j+1]                        == "trap") // right
+        &&  (grid[catPosition.i+1][catPosition.j - (catPosition.i+1)%2]  == "trap") // bot left
+        &&  (grid[catPosition.i+1][catPosition.j + catPosition.i%2]      == "trap") // bot right
+    );
 }
 
 /********************************
@@ -130,7 +148,6 @@ function clientJoinGame() {
 }
 
 // Le joueur chat a cliqué sur l'un des boutons directionnels
-// TODO : tester si la direction choisie est valide
 // TODO : tester si la direction choisie déclenche la victoire du chat
 // TODO : ne rien faire si ce n'est pas au chat de jouer.
 function clientMoveRequest(data) {
@@ -155,16 +172,33 @@ function clientMoveRequest(data) {
     //sauvegarde position du chat
     pos.neww.i = catPosition.i;
     pos.neww.j = catPosition.j;
-    //reset des boutons précédemment vérouillé
-    io.sockets.emit('resetCatButtons');
-    //calcul des pièges voisins (= boutons à désactiver sur l'ihm chat)
-    var nearTraps = getNearTraps(pos.neww);
-    var data = {
-        pos: pos,
-        traps: nearTraps
+
+    // Test de victoire du chat
+    if (isCatFree()) {
+        debug_log("[catWon]");
+        io.sockets.emit('catWon');
+    } else {
+        //reset des boutons précédemment vérouillé
+        io.sockets.emit('resetCatButtons');
+        //calcul des pièges voisins (= boutons à désactiver sur l'ihm chat)
+        var nearTraps = getNearTraps(pos.neww);
+        var data = {
+            pos: pos,
+            traps: nearTraps
+        }
+        io.sockets.emit('catMoved', data);
     }
-    io.sockets.emit('catMoved', data);
 };
+
+// détermine si le chat a gagné ou non
+function isCatFree() {
+    debug_log('[isCatFree]');
+
+    return (catPosition.i > 10 
+         || catPosition.i < 0 
+         || catPosition.j > 10 
+         || catPosition.j < 0);
+}
 
 // Calcule la position demandée par le chat
 // /!\ cette position est toujours valide, le chat n'a pas pu sélectionner une direction invalide
@@ -192,28 +226,32 @@ function nextCatPosition(position, direction) {
 }
 
 function getNearTraps(position) {
-    debug_log("grid["+(position.i-1)+"]["+(position.j-1)+"] = " + grid[position.i-1][position.j-1]);
+    debug_log("position.i="+position.i+" ; position.j="+position.j);
     var arrayTraps = [];
     
-    if(grid[position.i-1][position.j-(1-position.i%2)] == "trap") {
+    if(no_overflow(position.i) && grid[position.i-1][position.j-(1-position.i%2)] == "trap") {
         arrayTraps.push("btn_topleft");
     }
-    if(grid[position.i-1][position.j+position.i%2] == "trap") {
+    if(no_overflow(position.i) && grid[position.i-1][position.j+position.i%2] == "trap") {
         arrayTraps.push("btn_topright");
     }
-    if(grid[position.i][position.j-1] == "trap") {
+    if(no_overflow(position.j) && grid[position.i][position.j-1] == "trap") {
         arrayTraps.push("btn_left");
     }
-    if(grid[position.i][position.j+1] == "trap") {
+    if(no_overflow(position.j) && grid[position.i][position.j+1] == "trap") {
         arrayTraps.push("btn_right");
     }
-    if(grid[position.i+1][position.j-(1-position.i%2)] == "trap") {
+    if(no_overflow(position.i) && grid[position.i+1][position.j-(1-position.i%2)] == "trap") {
         arrayTraps.push("btn_botleft");
     }
-    if(grid[position.i+1][position.j+position.i%2] == "trap") {
+    if(no_overflow(position.i) && grid[position.i+1][position.j+position.i%2] == "trap") {
         arrayTraps.push("btn_botright");
     }
     return arrayTraps;
+}
+
+function no_overflow(coord) {
+    return ( coord < 10 && coord > 0);
 }
 
 // Pour debug

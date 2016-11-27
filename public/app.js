@@ -15,6 +15,8 @@ jQuery(function($){
             // conséquences sur les deux IHM
             IO.socket.on('beginNewGame', IO.beginNewGame );
             IO.socket.on('connected', IO.onConnected );
+            IO.socket.on('trapWon', IO.trapWon );
+            IO.socket.on('catWon', IO.catWon );
             // conséquences sur l'IHM trap
             IO.socket.on('newGameCreated', IO.onNewGameCreated );
             IO.socket.on('catMoved', IO.catMoved );
@@ -66,6 +68,14 @@ jQuery(function($){
         // Handler. Déclenche la réinitialisation les boutons de l'IHM chat
         resetCatButtons: function() {
             App.Cat.unlockButtons();
+        },
+
+        trapWon: function() {
+            App[App.myRole].victoryTrap();
+        },
+
+        catWon: function() {
+            App[App.myRole].victoryCat();
         },
 
         // Handler. Popup d'erreur
@@ -187,13 +197,21 @@ jQuery(function($){
             },
 
             // réception du mouvement du chat coté trap
-            catMoved : function(data) {
+            catMoved: function(data) {
               App.Trap.placerChat(
                 data.pos.old.i,
                 data.pos.old.j,
                 data.pos.neww.i,
                 data.pos.neww.j
               );
+            },
+
+            victoryTrap: function() {
+                App.$gameArea.load("/partials/end-trap.htm");
+            },
+
+            victoryCat: function() {
+                App.$gameArea.load("/partials/end-cat.htm");
             }
         },
 
@@ -269,6 +287,14 @@ jQuery(function($){
                 $('#btn_right').prop('disabled', false);
                 $('#btn_botleft').prop('disabled', false);
                 $('#btn_botright').prop('disabled', false);
+            },
+
+            victoryTrap: function() {
+                App.$gameArea.load("/partials/end-trap.htm");
+            },
+
+            victoryCat: function() {
+                App.$gameArea.load("/partials/end-cat.htm");
             }
         }
     };
