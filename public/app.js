@@ -18,7 +18,6 @@ jQuery(function($){
             IO.socket.on('directionForbidden', IO.directionForbidden);
             IO.socket.on('error', IO.error );
             IO.socket.on('catMoved', IO.catMoved );
-            IO.socket.on('gameOverCatWin', IO.onGameOverCatWin);
         },
 
         catMoved : function(data) {
@@ -62,14 +61,7 @@ jQuery(function($){
         // Handler. Popup d'erreur
         error : function(data) {
             alert(data.message);
-        },
-        
-        // Handler. le chat a gagné
-        onGameOverCatWin : function (){
-        		 debug_log('onGameOverCatWin');
-        		 App.Trap.displayGameOverCatWinScreen();
         }
-        
     };
 
     // Variable utilisée comme namespace. Regroupe le code concernant les affichages côté client, serveur..
@@ -117,15 +109,6 @@ jQuery(function($){
                 App.mySocketId = data.mySocketId;
 
                 App.$gameArea.load("/partials/waiting-create-game.htm");
-
-                // Définition du rôle adopté (Trap)
-                App.myRole = 'Trap';
-            },
-            
-            displayGameOverCatWinScreen: function () {
-                debug_log('[GAME OVER : 4/5] - Trap.gameOver (Cat win)');
-
-                App.$gameArea.load("/partials/GameOverCatWin.htm");
 
                 // Définition du rôle adopté (Trap)
                 App.myRole = 'Trap';
