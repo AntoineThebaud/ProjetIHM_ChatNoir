@@ -49,6 +49,9 @@ jQuery(function($){
         // Handler. Un piège a été posé
         trapPlaced: function(data) {
             App.Trap.gameDisplayTrap(data);
+            var turnArea = document.getElementById('turnArea');
+            turnArea.textContent = "chat, a toi de jouer !!";
+            
         },
 
         directionForbidden: function(direction) {
@@ -135,6 +138,7 @@ jQuery(function($){
                 // et génère la grille de jeu dynamiquement
                 App.$gameArea.load("/partials/game-host-screen.htm", function() {
                     var btnArea = document.getElementById('btnArea');
+                    var turnArea = document.getElementById('turnArea');
                     var btnRow;
                     var btn;
 
@@ -168,6 +172,8 @@ jQuery(function($){
                             btnRow.appendChild(btn);
                         }
                         btnArea.appendChild(btnRow);
+                        turnArea.textContent = " Chat, à toi de jouer !!";
+                        
                     }
 
                     // Initialisation du chat (au milieu de la map)
@@ -198,6 +204,8 @@ jQuery(function($){
                 data.pos.neww.i,
                 data.pos.neww.j
               );
+              var turnArea = document.getElementById('turnArea');
+              turnArea.textContent = "piègeur, a toi de jouer !!";
             }
         },
 

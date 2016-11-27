@@ -1,4 +1,5 @@
 
+
 .ctm-btn-title {
 	margin-top: 20px;
 	float: right !important;
@@ -49,3 +50,12 @@ button:disabled {
   width: 600px;
   height: 600px;
 }
+.turnArea{
+	text-align: center;
+	font-size:30px ;
+}
+.row{
+	width:100%;
+	margin:auto ;
+}
+

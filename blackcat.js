@@ -1,5 +1,6 @@
 var io;
 var gameSocket;
+var catTurn;
 
 // variables de controle pour le lancement de la partie
 var serverReady;
@@ -14,6 +15,7 @@ var grid;
 exports.initGame = function(sio, socket) {
 	debug_log('initGame');
     io = sio;
+    catTurn = 'true';
     gameSocket = socket;
     gameSocket.emit('connected', { message: "You are connected!" });
 
@@ -73,14 +75,17 @@ function hostRoomFull() {
 
 // Le poseur de piège a cliqué sur une case pour poser un piège
 function hostTrapRequest(position) {
-    debug_log('[BLABLABLABLA : 2/?] - hostTrapRequest('+position.x+';'+position.y+')');
-    //TODO 
-    grid[position.x][position.y] = "trap";
-    io.sockets.emit('trapPlaced', position);
-    //TODO : si le chat est adjacent, mettre à jour sa carte
-    var near = isCatNear(position);
-    if (near != null) {
-        io.sockets.emit('directionForbidden', near);
+    if(catTurn == 'false'){
+    	debug_log('[BLABLABLABLA : 2/?] - hostTrapRequest('+position.x+';'+position.y+')');
+    	//TODO 
+    	grid[position.x][position.y] = "trap";
+    	io.sockets.emit('trapPlaced', position);
+    	//TODO : si le chat est adjacent, mettre à jour sa carte
+    	var near = isCatNear(position);
+    	if (near != null) {
+        		io.sockets.emit('directionForbidden', near);
+    	}
+    	catTurn = 'true';
     }
 }
 
@@ -145,22 +150,25 @@ var pos = {
 // TODO : tester si la direction choisie est valide
 // TODO : tester si la direction choisie déclenche la victoire du chat
 function catMoved(data) {
-    pos.old.i = catPosition.i;
-    pos.old.j = catPosition.j;
-    debug_log('[Cat Mouvement] - Cat moved ' + data.direction);
-    catPosition = nextCatPosition(catPosition, data.direction);
-    pos.neww.i = catPosition.i;
-    pos.neww.j = catPosition.j;
-    var nearTraps = getNearTraps(pos.neww);
-    var GameOver = isGameOver(pos.neww);
-    if(GameOver == 'true'){
-    	io.sockets.emit('gameOverCatWin');
+	if(catTurn == 'true'){
+    	pos.old.i = catPosition.i;
+    	pos.old.j = catPosition.j;
+    	debug_log('[Cat Mouvement] - Cat moved ' + data.direction);
+    	catPosition = nextCatPosition(catPosition, data.direction);
+    	pos.neww.i = catPosition.i;
+    	pos.neww.j = catPosition.j;
+    	var nearTraps = getNearTraps(pos.neww);
+    	var GameOver = isGameOver(pos.neww);
+    	if(GameOver == 'true'){
+    		io.sockets.emit('gameOverCatWin');
+    	}
+    	var data = {
+        		pos: pos,
+        		traps: nearTraps
+    	}
+    	io.sockets.emit('catMoved', data);
+    	catTurn = 'false';
     }
-    var data = {
-        pos: pos,
-        traps: nearTraps
-    }
-    io.sockets.emit('catMoved', data);
 };
 
 function isGameOver(pos){
