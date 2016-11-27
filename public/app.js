@@ -10,16 +10,25 @@ jQuery(function($){
         init: function() {
             // lien serveur <-> client
             IO.socket = io.connect();
-            // events
-            IO.socket.on('connected', IO.onConnected );
-            IO.socket.on('newGameCreated', IO.onNewGameCreated );
+            
+            // Events
+            // conséquences sur les deux IHM
             IO.socket.on('beginNewGame', IO.beginNewGame );
-            IO.socket.on('trapPlaced', IO.trapPlaced );
-            IO.socket.on('directionForbidden', IO.directionForbidden);
-            IO.socket.on('error', IO.error );
+            IO.socket.on('connected', IO.onConnected );
+            IO.socket.on('trapWon', IO.trapWon );
+            IO.socket.on('catWon', IO.catWon );
+            // conséquences sur l'IHM trap
+            IO.socket.on('newGameCreated', IO.onNewGameCreated );
             IO.socket.on('catMoved', IO.catMoved );
+            IO.socket.on('trapPlaced', IO.trapPlaced );
+            // conséquences sur l'IHM cat
+            IO.socket.on('directionForbidden', IO.directionForbidden);
+            IO.socket.on('resetCatButtons', IO.resetCatButtons );
+
+            IO.socket.on('error', IO.error );
         },
 
+        // Handler. Le chat a été déplacé (mise à jour des 2 IHM)
         catMoved : function(data) {
           App[App.myRole].catMoved(data);
         },
@@ -45,7 +54,7 @@ jQuery(function($){
             App[App.myRole].gameCreateMap(data);
         },
 
-        // Handler. Un piège a été posé
+        // Handler. Un piège a été posé (mise à jour de l'IHM trap)
         trapPlaced: function(data) {
             App.Trap.gameDisplayTrap(data);
             var turnArea = document.getElementById('turnArea');
@@ -53,9 +62,23 @@ jQuery(function($){
             
         },
 
+        // Handler. Un piège a été posé prêt du chat (mise à jour de l'IHM cat)
         directionForbidden: function(direction) {
             debug_log('directionForbidden ('+direction+')');
             App.Cat.gameLockButton(direction);
+        },
+
+        // Handler. Déclenche la réinitialisation les boutons de l'IHM chat
+        resetCatButtons: function() {
+            App.Cat.unlockButtons();
+        },
+
+        trapWon: function() {
+            App[App.myRole].victoryTrap();
+        },
+
+        catWon: function() {
+            App[App.myRole].victoryCat();
         },
 
         // Handler. Popup d'erreur
@@ -180,7 +203,7 @@ jQuery(function($){
             },
 
             // réception du mouvement du chat coté trap
-            catMoved : function(data) {
+            catMoved: function(data) {
               App.Trap.placerChat(
                 data.pos.old.i,
                 data.pos.old.j,
@@ -189,6 +212,15 @@ jQuery(function($){
               );
               var turnArea = document.getElementById('turnArea');
               turnArea.textContent = "piègeur, a toi de jouer !!";
+            },
+
+            victoryTrap: function() {
+                App.$gameArea.load("/partials/end-trap.htm");
+            },
+
+            victoryCat: function() {
+                App.$gameArea.load("/partials/end-cat.htm");
+
             }
         },
 
@@ -238,23 +270,40 @@ jQuery(function($){
                 });                
             },
 
+            onMoveButton: function(direction) {
+                debug_log("Yolo swag : " + direction);
+                IO.socket.emit('clientMoveRequest', {'direction': direction });
+                // TODO : emettre un event à blackcat.js
+            },
+
             gameLockButton: function(direction) {
                 debug_log('[BLABLABLABLA : 2/?] - gameLockButton('+direction+')');
                 $('#'+direction).prop('disabled', true);
             },
 
-            onMoveButton: function(direction) {
-                debug_log("Yolo swag : " + direction);
-                IO.socket.emit('catMoved', {'direction': direction });
-                // TODO : emettre un event à blackcat.js
-            },
-
-            catMoved : function(data) {
+            catMoved: function(data) {
                 debug_log("data.traps = ")
                 debug_log(data.traps);
                 for (var elem in data.traps) {
                     App.Cat.gameLockButton(data.traps[elem]);
                 }
+            },
+
+            unlockButtons: function() {
+                $('#btn_topleft').prop('disabled', false);
+                $('#btn_topright').prop('disabled', false);
+                $('#btn_left').prop('disabled', false);
+                $('#btn_right').prop('disabled', false);
+                $('#btn_botleft').prop('disabled', false);
+                $('#btn_botright').prop('disabled', false);
+            },
+
+            victoryTrap: function() {
+                App.$gameArea.load("/partials/end-trap.htm");
+            },
+
+            victoryCat: function() {
+                App.$gameArea.load("/partials/end-cat.htm");
             }
         }
     };
