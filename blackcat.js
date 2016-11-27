@@ -22,7 +22,7 @@ exports.initGame = function(sio, socket) {
     gameSocket.on('hostRoomFull', hostRoomFull);
     gameSocket.on('hostTrapRequest', hostTrapRequest);
     gameSocket.on('clientJoinGame', clientJoinGame);
-    gameSocket.on('catMoved', catMoved);
+    gameSocket.on('clientMoveRequest', clientMoveRequest);
 
     // Initilisation des variables de controle
     serverReady = false;
@@ -129,27 +129,35 @@ function clientJoinGame() {
     }
 }
 
-var pos = {
-    old : {
-        i : '',
-        j : ''
-    },
-    neww : {
-        i : '',
-        j : ''
-    }
-}
-
 // Le joueur chat a cliqué sur l'un des boutons directionnels
 // TODO : tester si la direction choisie est valide
 // TODO : tester si la direction choisie déclenche la victoire du chat
-function catMoved(data) {
+// TODO : ne rien faire si ce n'est pas au chat de jouer.
+function clientMoveRequest(data) {
+    debug_log('[Cat Mouvement] - Cat moved ' + data.direction);
+
+    //variable utilisée pour la mise à jour de la map
+    var pos = {
+        old : {
+            i : '',
+            j : ''
+        },
+        neww : {
+            i : '',
+            j : ''
+        }
+    }
+    //garde en mémoire l'ancienne position du chat pour mettre à jour la map du serveur
     pos.old.i = catPosition.i;
     pos.old.j = catPosition.j;
-    debug_log('[Cat Mouvement] - Cat moved ' + data.direction);
+    //calcul de la nouvelle position du chat
     catPosition = nextCatPosition(catPosition, data.direction);
+    //sauvegarde position du chat
     pos.neww.i = catPosition.i;
     pos.neww.j = catPosition.j;
+    //reset des boutons précédemment vérouillé
+    io.sockets.emit('resetCatButtons');
+    //calcul des pièges voisins (= boutons à désactiver sur l'ihm chat)
     var nearTraps = getNearTraps(pos.neww);
     var data = {
         pos: pos,
@@ -158,6 +166,9 @@ function catMoved(data) {
     io.sockets.emit('catMoved', data);
 };
 
+// Calcule la position demandée par le chat
+// /!\ cette position est toujours valide, le chat n'a pas pu sélectionner une direction invalide
+// car les boutons associés sont désactivés dans ce cas là.
 function nextCatPosition(position, direction) {
     if (direction == 'left') {
         position.j--;
@@ -181,12 +192,9 @@ function nextCatPosition(position, direction) {
 }
 
 function getNearTraps(position) {
-    debug_log("grid =");
-    debug_log(grid);
-
-    var arrayTraps = [];
-   /* return ["btn_topleft", "btn_topright", "btn_right"];*/
     debug_log("grid["+(position.i-1)+"]["+(position.j-1)+"] = " + grid[position.i-1][position.j-1]);
+    var arrayTraps = [];
+    
     if(grid[position.i-1][position.j-(1-position.i%2)] == "trap") {
         arrayTraps.push("btn_topleft");
     }
