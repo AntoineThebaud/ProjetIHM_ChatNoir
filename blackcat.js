@@ -23,6 +23,7 @@ exports.initGame = function(sio, socket) {
     gameSocket.on('hostTrapRequest', hostTrapRequest);
     gameSocket.on('clientJoinGame', clientJoinGame);
     gameSocket.on('catMoved', catMoved);
+    
 
     // Initilisation des variables de controle
     serverReady = false;
@@ -151,6 +152,10 @@ function catMoved(data) {
     pos.neww.i = catPosition.i;
     pos.neww.j = catPosition.j;
     var nearTraps = getNearTraps(pos.neww);
+    var GameOver = isGameOver(pos.neww);
+    if(GameOver == 'true'){
+    	io.sockets.emit('gameOverCatWin');
+    }
     var data = {
         pos: pos,
         traps: nearTraps
@@ -158,6 +163,12 @@ function catMoved(data) {
     io.sockets.emit('catMoved', data);
 };
 
+function isGameOver(pos){
+	if(pos.i == 11 | pos.j == 11)
+		return 'true';
+	else 
+		return 'false'
+}
 function nextCatPosition(position, direction) {
     if (direction == 'left') {
         position.j--;
@@ -187,6 +198,7 @@ function getNearTraps(position) {
     var arrayTraps = [];
    /* return ["btn_topleft", "btn_topright", "btn_right"];*/
     debug_log("grid["+(position.i-1)+"]["+(position.j-1)+"] = " + grid[position.i-1][position.j-1]);
+    
     if(grid[position.i-1][position.j-(1-position.i%2)] == "trap") {
         arrayTraps.push("btn_topleft");
     }
