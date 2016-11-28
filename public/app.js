@@ -59,7 +59,6 @@ jQuery(function($){
             App.Trap.gameDisplayTrap(data);
             var turnArea = document.getElementById('turnArea');
             turnArea.textContent = "chat, a toi de jouer !!";
-            
         },
 
         // Handler. Un piège a été posé prêt du chat (mise à jour de l'IHM cat)
@@ -156,18 +155,14 @@ jQuery(function($){
                         for(var j = 0; j < 11; j++) {
                             btn = document.createElement('button');
                             btn.id = "btn_"+i+'_'+j;
-                            btn.className = "btn btn-success ctm-btn-circle";
+                            btn.className = "btn btn-success btngame-trapscreen";
                             // Closure pour ajouter un handler sur chaque bouton
                             // Un bouton cliqué est vérouillé
                             btn.onclick = (function(x, y) {
                                 return function() {
-                                    // thisBtn.className = "btn ctm-btn-trap ctm-btn-circle";
-                                    // TODO : emettre un event à blackcat.js
-                                    // c'est blackcat.js qui se charge de gérer la partie,
-                                    // de tester si le chat est bloqué etc..
                                     var data = {
-                                        x : x,
-                                        y : y
+                                        x: x,
+                                        y: y
                                     }
                                     IO.socket.emit('hostTrapRequest', data);
                                 };
@@ -180,33 +175,20 @@ jQuery(function($){
                     }
 
                     // Initialisation du chat (au milieu de la map)
-                    //$('#btn_5_5').attr('class', 'btn btn-danger ctm-btn-circle');
-                    App.Trap.placerPiege(5,5);
-
+                    $('#btn_5_5').attr('class', 'btn btn-cat btngame-trapscreen');
                 });
             },
 
             gameDisplayTrap: function(data) {
-                $('#btn_'+data.x+'_'+data.y).attr('class', 'btn ctm-btn-trap ctm-btn-circle');
-            },
-
-            placerPiege: function(i,j) {
-              $('#btn_'+i+'_'+j).attr('class', 'btn btn-danger ctm-btn-circle');
-            },
-
-            placerChat: function(i,j, i2, j2) {
-              $('#btn_'+i+'_'+j).attr('class', 'btn btn-success ctm-btn-circle');
-              $('#btn_'+i2+'_'+j2).attr('class', 'btn btn-danger ctm-btn-circle');
+                $('#btn_'+data.x+'_'+data.y).attr('class', 'btn btn-trapped btngame-trapscreen');
             },
 
             // réception du mouvement du chat coté trap
             catMoved: function(data) {
-              App.Trap.placerChat(
-                data.pos.old.i,
-                data.pos.old.j,
-                data.pos.neww.i,
-                data.pos.neww.j
-              );
+              // déplace le chat sur la map
+              $('#btn_'+data.pos.old.i+'_'+data.pos.old.j).attr('class', 'btn btn-success btngame-trapscreen');
+              $('#btn_'+data.pos.neww.i+'_'+data.pos.neww.j).attr('class', 'btn btn-cat btngame-trapscreen');
+
               var turnArea = document.getElementById('turnArea');
               turnArea.textContent = "piègeur, a toi de jouer !!";
             }
