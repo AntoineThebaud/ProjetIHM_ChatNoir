@@ -50,7 +50,7 @@ jQuery(function($){
         beginNewGame : function(data) {
             debug_log('[BEGIN NEW GAME : 2/2] - IO.beginNewGame');
             // Il y a 2 versions pour cette fonction (Trap & Cat)
-            // Chaque appareil appelle la fonction qui correspond à son role
+            // Chacun appelle la fonction qui correspond à son role
             App[App.myRole].gameCreateMap(data);
         },
 
@@ -74,11 +74,11 @@ jQuery(function($){
         },
 
         trapWon: function() {
-            App[App.myRole].victoryTrap();
+            App.$gameArea.load("/partials/end-trap.htm");
         },
 
         catWon: function() {
-            App[App.myRole].victoryCat();
+            App.$gameArea.load("/partials/end-cat.htm");
         },
 
         // Handler. Popup d'erreur
@@ -87,18 +87,15 @@ jQuery(function($){
         }
     };
 
-    // Variable utilisée comme namespace. Regroupe le code concernant les affichages côté client, serveur..
+    // Variable utilisée comme namespace. Regroupe le code concernant les IHM (cat & trap)
     var App = {
 
-        // Variable utilisée pour différencier les traitements (affichages..) des deux écrans
+        // Variable utilisée pour différencier les traitements sur les deux écrans.
         myRole: '', // aura comme valeur 'Trap' ou 'Cat'
 
-        // L'identifiant de l'objet socket (de Socket.IO).
-        // Est généré lorsque la page est chargée pour la première fois
+        // L'identifiant de l'objet socket (de Socket.IO) est généré lorsque
+        // la page est chargée pour la première fois
         mySocketId: '',
-
-        // Compteur pour les tours de jeu
-        currentRound: 0,
 
         // Fonction d'initialisation appelée au chargement de la page
         init: function () {
@@ -114,7 +111,7 @@ jQuery(function($){
             App.$doc.on('click', '#btnJoinGame', App.Cat.onJoinClick);
         },
 
-        // Variable utilisée comme namespace. Regroupe le code concernant le poseur de piège (serveur)
+        // Variable utilisée comme namespace. Regroupe le code concernant le poseur de piège (trap)
         Trap : {
 
             // Référence vers le joueur chat
@@ -212,22 +209,14 @@ jQuery(function($){
               );
               var turnArea = document.getElementById('turnArea');
               turnArea.textContent = "piègeur, a toi de jouer !!";
-            },
-
-            victoryTrap: function() {
-                App.$gameArea.load("/partials/end-trap.htm");
-            },
-
-            victoryCat: function() {
-                App.$gameArea.load("/partials/end-cat.htm");
-
             }
+
         },
 
-        // Variable utilisée comme namespace. Regroupe le code concernant le chat (client)
+        // Variable utilisée comme namespace. Regroupe le code concernant le chat (cat)
         Cat : {
 
-            // Référence vers la socket ID du serveur (Trap)
+            // Référence vers la socket ID du serveur
             hostSocketId: '',
 
             // Handler. Le bouton 'JOIN' a été cliqué, l'écran d'attente du chat est affiché.
@@ -273,7 +262,6 @@ jQuery(function($){
             onMoveButton: function(direction) {
                 debug_log("Yolo swag : " + direction);
                 IO.socket.emit('clientMoveRequest', {'direction': direction });
-                // TODO : emettre un event à blackcat.js
             },
 
             gameLockButton: function(direction) {
@@ -296,14 +284,6 @@ jQuery(function($){
                 $('#btn_right').prop('disabled', false);
                 $('#btn_botleft').prop('disabled', false);
                 $('#btn_botright').prop('disabled', false);
-            },
-
-            victoryTrap: function() {
-                App.$gameArea.load("/partials/end-trap.htm");
-            },
-
-            victoryCat: function() {
-                App.$gameArea.load("/partials/end-cat.htm");
             }
         }
     };
