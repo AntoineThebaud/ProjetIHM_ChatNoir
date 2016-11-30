@@ -176,6 +176,8 @@ jQuery(function($){
 
                     // Initialisation du chat (au milieu de la map)
                     $('#btn_5_5').attr('class', 'btn btn-cat btngame-trapscreen');
+
+                    // TODO : verrouiller un certain nombre de cases à l'initialisation
                 });
             },
 
