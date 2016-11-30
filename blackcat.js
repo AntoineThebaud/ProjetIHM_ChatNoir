@@ -135,12 +135,12 @@ function isCatNear(position) {
 function isCatTrapped() {
     debug_log('[isCatTrapped]');
 
-    return ((grid[catPosition.i-1][catPosition.j - (catPosition.i+1)%2]  == "trap") // top left
-        &&  (grid[catPosition.i-1][catPosition.j + catPosition.i%2]      == "trap") // top right
-        &&  (grid[catPosition.i][catPosition.j-1]                        == "trap") // left
-        &&  (grid[catPosition.i][catPosition.j+1]                        == "trap") // right
-        &&  (grid[catPosition.i+1][catPosition.j - (catPosition.i+1)%2]  == "trap") // bot left
-        &&  (grid[catPosition.i+1][catPosition.j + catPosition.i%2]      == "trap") // bot right
+    return ((catPosition.i != 0     &&      grid[catPosition.i-1][catPosition.j - (catPosition.i+1)%2]  == "trap") // top left
+        &&  (catPosition.i != 0     &&      grid[catPosition.i-1][catPosition.j + catPosition.i%2]      == "trap") // top right
+        &&  (catPosition.j != 0     &&      grid[catPosition.i][catPosition.j-1]                        == "trap") // left
+        &&  (catPosition.j != 10    &&      grid[catPosition.i][catPosition.j+1]                        == "trap") // right
+        &&  (catPosition.i != 10    &&      grid[catPosition.i+1][catPosition.j - (catPosition.i+1)%2]  == "trap") // bot left
+        &&  (catPosition.i != 10    &&      grid[catPosition.i+1][catPosition.j + catPosition.i%2]      == "trap") // bot right
     );
 }
 
@@ -248,30 +248,25 @@ function getNearTraps(position) {
     debug_log("position.i="+position.i+" ; position.j="+position.j);
     var arrayTraps = [];
     
-    if(noOverflow(position.i) && grid[position.i-1][position.j-(1-position.i%2)] == "trap") {
+    if(position.i != 0 && grid[position.i-1][position.j-(1-position.i%2)] == "trap") {
         arrayTraps.push("btn_topleft");
     }
-    if(noOverflow(position.i) && grid[position.i-1][position.j+position.i%2] == "trap") {
+    if(position.i != 0 && grid[position.i-1][position.j+position.i%2] == "trap") {
         arrayTraps.push("btn_topright");
     }
-    if(noOverflow(position.j) && grid[position.i][position.j-1] == "trap") {
+    if(position.j != 0 && grid[position.i][position.j-1] == "trap") {
         arrayTraps.push("btn_left");
     }
-    if(noOverflow(position.j) && grid[position.i][position.j+1] == "trap") {
+    if(position.j != 10 && grid[position.i][position.j+1] == "trap") {
         arrayTraps.push("btn_right");
     }
-    if(noOverflow(position.i) && grid[position.i+1][position.j-(1-position.i%2)] == "trap") {
+    if(position.i != 10 && grid[position.i+1][position.j-(1-position.i%2)] == "trap") {
         arrayTraps.push("btn_botleft");
     }
-    if(noOverflow(position.i) && grid[position.i+1][position.j+position.i%2] == "trap") {
+    if(position.i != 10 && grid[position.i+1][position.j+position.i%2] == "trap") {
         arrayTraps.push("btn_botright");
     }
     return arrayTraps;
-}
-
-// s'assure que la variable passée en paramètre ne dépasse pas le scope de la grille de jeu.
-function noOverflow(coord) {
-    return ( coord < 10 && coord > 0);
 }
 
 // Pour debug
