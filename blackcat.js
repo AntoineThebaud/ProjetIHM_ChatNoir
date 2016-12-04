@@ -23,6 +23,7 @@ exports.initGame = function(sio, socket) {
     gameSocket.on('hostCreateNewGame', hostCreateNewGame);
     gameSocket.on('hostRoomFull', hostRoomFull);
     gameSocket.on('hostTrapRequest', hostTrapRequest);
+    gameSocket.on('hostInitTrap', hostInitTrap);
     gameSocket.on('clientJoinGame', clientJoinGame);
     gameSocket.on('clientMoveRequest', clientMoveRequest);
 
@@ -87,17 +88,32 @@ function hostTrapRequest(position) {
     // Si le chat est à proximité : envoie d'un event à l'IHM cat (verrouillage d'une direction)
 	var near = isCatNear(position);
 	if (near != null) {
-    		io.sockets.emit('directionForbidden', near);
+    	io.sockets.emit('directionForbidden', near);
 	}
     	
     // Test de victoire du poseur de piège
 	if (isCatTrapped()) {
-    		debug_log("[trapWon]");
-    		io.sockets.emit('trapWon');
+    	debug_log("[trapWon]");
+    	io.sockets.emit('trapWon');
 	}
 
     // passe la main au joueur chat
 	catTurn = true;    
+}
+
+// pose d'un piège à l'initialisation
+// TODO : améliorer tout ça (un seul event avec tout ?)
+function hostInitTrap(position) {
+    debug_log('[BLABLABLABLA : 2/?] - hostInitTrap('+position.x+';'+position.y+')');
+
+    // mise à jour de la variable grille
+    grid[position.x][position.y] = "trap";
+
+    // TODO : patch à optimiser
+    position.init = true;
+
+    // mise à jour de la map sur l'IHM trap
+    io.sockets.emit('trapPlaced', position);  
 }
 
 // détermine si le piège venant d'être posé et à côté du chat

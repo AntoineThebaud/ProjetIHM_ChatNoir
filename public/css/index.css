@@ -40,10 +40,10 @@
 }
 
 .div-cat {
-  width: 600px;
-  height: 600px;
+  width: 250px;
+  height: 250px;
 }
-.turnArea{
+.titleStyle {
 	text-align: center;
 	font-size: 30px ;
 }

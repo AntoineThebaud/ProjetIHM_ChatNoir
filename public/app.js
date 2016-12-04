@@ -30,7 +30,7 @@ jQuery(function($){
 
         // Handler. Le chat a été déplacé (mise à jour des 2 IHM)
         catMoved : function(data) {
-          App[App.myRole].catMoved(data);
+            App[App.myRole].catMoved(data);
         },
 
         // Handler. Connexion établie
@@ -57,8 +57,11 @@ jQuery(function($){
         // Handler. Un piège a été posé (mise à jour de l'IHM trap)
         trapPlaced: function(data) {
             App.Trap.gameDisplayTrap(data);
-            var turnArea = document.getElementById('turnArea');
-            turnArea.textContent = "chat, a toi de jouer !!";
+            // TODO : patch à optimiser
+            if (data.init != true) {
+                var turnArea = document.getElementById('turnArea');
+                turnArea.textContent = "C'est au tour de : Cat";
+            }            
         },
 
         // Handler. Un piège a été posé prêt du chat (mise à jour de l'IHM cat)
@@ -170,14 +173,13 @@ jQuery(function($){
                             btnRow.appendChild(btn);
                         }
                         btnArea.appendChild(btnRow);
-                        turnArea.textContent = " Chat, à toi de jouer !!";
-                        
+                        turnArea.textContent = "C'est au tour de : Trap";              
                     }
+                    // TODO : verrouiller un certain nombre de cases à l'initialisation
+                    App.Trap.lockRandomButtons();
 
                     // Initialisation du chat (au milieu de la map)
                     $('#btn_5_5').attr('class', 'btn btn-cat btngame-trapscreen');
-
-                    // TODO : verrouiller un certain nombre de cases à l'initialisation
                 });
             },
 
@@ -187,14 +189,31 @@ jQuery(function($){
 
             // réception du mouvement du chat coté trap
             catMoved: function(data) {
-              // déplace le chat sur la map
-              $('#btn_'+data.pos.old.i+'_'+data.pos.old.j).attr('class', 'btn btn-success btngame-trapscreen');
-              $('#btn_'+data.pos.neww.i+'_'+data.pos.neww.j).attr('class', 'btn btn-cat btngame-trapscreen');
+                // déplace le chat sur la map
+                $('#btn_'+data.pos.old.i+'_'+data.pos.old.j).attr('class', 'btn btn-success btngame-trapscreen');
+                $('#btn_'+data.pos.neww.i+'_'+data.pos.neww.j).attr('class', 'btn btn-cat btngame-trapscreen');
 
-              var turnArea = document.getElementById('turnArea');
-              turnArea.textContent = "piègeur, a toi de jouer !!";
+                var turnArea = document.getElementById('turnArea');
+                turnArea.textContent = "C'est au tour de : Trap"; 
+            },
+
+            lockRandomButtons: function() {
+                var nbInitTraps = 10;
+                var data = {
+                    x: null,
+                    y: null
+                }
+                for(var i = 0; i <= nbInitTraps; i++) {
+                    data.x = Math.floor(Math.random() * 11),
+                    data.y = Math.floor(Math.random() * 11)
+                    //TODO : à optimiser : ne pas poser de piège sur la case du milieu (où le chat se trouve)
+                    if (data.x == 5 && data.y == 5) {
+                        i--;
+                        continue;
+                    }
+                    IO.socket.emit('hostInitTrap', data);
+                }                
             }
-
         },
 
         // Variable utilisée comme namespace. Regroupe le code concernant le chat (cat)
@@ -240,7 +259,8 @@ jQuery(function($){
                     App.$doc.on('click', '#btn_botright', function(){
                         App.Cat.onMoveButton("botright");
                     });
-                });                
+                    document.getElementById('turnArea').textContent = "C'est au tour de : Trap"; 
+                });
             },
 
             onMoveButton: function(direction) {
@@ -259,6 +279,7 @@ jQuery(function($){
                 for (var elem in data.traps) {
                     App.Cat.gameLockButton(data.traps[elem]);
                 }
+                document.getElementById('turnArea').textContent = "C'est au tour de : Trap"; 
             },
 
             unlockButtons: function() {
