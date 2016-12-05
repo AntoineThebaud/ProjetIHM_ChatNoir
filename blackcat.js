@@ -77,8 +77,10 @@ function hostRoomFull() {
 function hostTrapRequest(position) {
     debug_log('[BLABLABLABLA : 2/?] - hostTrapRequest('+position.x+';'+position.y+')');
 
-    if(catTurn) return;
-
+    if(catTurn){
+    	io.sockets.emit('RequestFailed');
+    	return;
+    } 
     // mise à jour de la variable grille
 	grid[position.x][position.y] = "trap";
 
@@ -189,8 +191,11 @@ function clientMoveRequest(data) {
     //ignorer l'évenement si ce n'est pas le tour du chat
     //TODO? : déplacer cette responsabilité côté client (si
     //ce n'est pas au chat de jouer, l'event n'est pas envoyé)
-    if(!catTurn) return;
-
+    if(!catTurn) {
+    	io.sockets.emit('RequestFailed');
+    	return;
+    }
+    
     //variable utilisée pour la mise à jour de la map
     var pos = {
         old : {

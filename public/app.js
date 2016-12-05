@@ -24,6 +24,8 @@ jQuery(function($){
             // conséquences sur l'IHM cat
             IO.socket.on('directionForbidden', IO.directionForbidden);
             IO.socket.on('resetCatButtons', IO.resetCatButtons );
+            IO.socket.on('RequestFailed', IO.requestFailed );
+
 
             IO.socket.on('error', IO.error );
         },
@@ -73,6 +75,12 @@ jQuery(function($){
         // Handler. Déclenche la réinitialisation les boutons de l'IHM chat
         resetCatButtons: function() {
             App.Cat.unlockButtons();
+        },
+        
+        requestFailed: function(){
+        var audio;
+        audio = new Audio("/sound/error.wav");
+ 		audio.play();
         },
 
         // Handler : Trap a gagné la partie

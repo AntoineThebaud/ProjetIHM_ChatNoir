@@ -1,5 +1,4 @@
 
-
 .ctm-btn-title {
 	float: right !important;
 	font-weight: bold;
@@ -50,10 +49,7 @@ img{
   width: 325px;
   height: 325px;
 }
-.titleStyle {
-	text-align: center;
-	font-size: 30px ;
-}
+
 .row {
 	width:100%;
 	margin:auto ;
@@ -70,4 +66,9 @@ img{
 
 .top-offset {
   margin-top: 100px;
+}
+
+.disclaimer {
+  text-align: center;
+  font-size: 30px ;
 }
