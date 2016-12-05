@@ -8,6 +8,7 @@ jQuery(function($){
         // - initialise le lien entre les sockets client et serveur.
         // - initialise les events
         init: function() {
+            debug_log('IO.init()');
             // lien serveur <-> client
             IO.socket = io.connect();
             
@@ -32,11 +33,13 @@ jQuery(function($){
 
         // Handler. Le chat a été déplacé (mise à jour des 2 IHM)
         catMoved : function(data) {
+            debug_log('IO.catMoved()');
             App[App.myRole].catMoved(data);
         },
 
         // Handler. Connexion établie
         onConnected : function(data) {
+            debug_log('IO.onConnected()');
             // Met en cache une copie du session ID du client
             App.mySocketId = IO.socket.socket.sessionid;
             debug_log('[CONNECTION] IO.onConnected OK : ' + data.message);
@@ -44,13 +47,13 @@ jQuery(function($){
 
         // Handler. Partie créée. Renvoit vers Trap.gameInit
         onNewGameCreated : function(data) {
-            debug_log('[CREATE NEW GAME : 3/5] - IO.onNewGameCreated');
+            debug_log('IO.onNewGameCreated()');
             App.Trap.displayWaitingScreen(data);
         },
 
         // Handler. lancement de la partie.
         beginNewGame : function(data) {
-            debug_log('[BEGIN NEW GAME : 2/2] - IO.beginNewGame');
+            debug_log('IO.beginNewGame()');
             // Il y a 2 versions pour cette fonction (Trap & Cat)
             // Chacun appelle la fonction qui correspond à son role
             App[App.myRole].gameCreateMap(data);
@@ -58,6 +61,7 @@ jQuery(function($){
 
         // Handler. Un piège a été posé (mise à jour de l'IHM trap)
         trapPlaced: function(data) {
+            debug_log('IO.trapPlaced()');
             App.Trap.gameDisplayTrap(data);
             // TODO : patch à optimiser
             if (data.init != true) {
@@ -68,27 +72,31 @@ jQuery(function($){
 
         // Handler. Un piège a été posé prêt du chat (mise à jour de l'IHM cat)
         directionForbidden: function(direction) {
-            debug_log('directionForbidden ('+direction+')');
+            debug_log('IO.directionForbidden ('+direction+')');
             App.Cat.gameLockButton(direction);
         },
 
         // Handler. Déclenche la réinitialisation les boutons de l'IHM chat
         resetCatButtons: function() {
+            debug_log('IO.resetCatButtons()');
             App.Cat.unlockButtons();
         },
         
-        requestFailed: function(){
-        var audio;
-        audio = new Audio("/sound/error.wav");
- 		audio.play();
+        requestFailed: function() {
+            debug_log('IO.requestFailed()');
+            var audio;
+            audio = new Audio("/sound/error.wav");
+            audio.play();
         },
 
         // Handler : Trap a gagné la partie
         trapWon: function() {
+            debug_log('IO.trapWon()');
             App[App.myRole].trapVictory();
         },
 
         catWon: function() {
+            debug_log('IO.catWon()');
             App[App.myRole].catVictory();
         },
 
@@ -110,6 +118,8 @@ jQuery(function($){
 
         // Fonction d'initialisation appelée au chargement de la page
         init: function () {
+            debug_log('App.init()');
+
             // Création de variables 'alias' pour manipuler la page
             App.$doc = $(document);
             App.$gameArea = $('#gameArea');
@@ -124,6 +134,7 @@ jQuery(function($){
         },
 
         displayRules: function() {
+            debug_log('App.displayRules()');
             App.$gameArea.load("/partials/rules.htm");
         },
 
@@ -135,13 +146,13 @@ jQuery(function($){
 
             // Handler. Le bouton 'CREATE' sur l'écran d'accueil a été cliqué
             onCreateClick: function() {
-                debug_log('[CREATE NEW GAME : 1/5] - Trap.onCreateClick (button event handler)');
+                debug_log('App.Trap.onCreateClick()');
                 IO.socket.emit('hostCreateNewGame');
             },
 
             // Handler. L'écran d'attente du serveur est affiché.
             displayWaitingScreen: function (data) {
-                debug_log('[CREATE NEW GAME : 4/5] - Trap.gameInit (initialize variables)');
+                debug_log('App.Trap.displayWaitingScreen()');
                 App.mySocketId = data.mySocketId;
 
                 App.$gameArea.load("/partials/waiting-create-game.htm");
@@ -152,7 +163,7 @@ jQuery(function($){
 
             // Affichage de l'écran de jeu du poseur de piège
             gameCreateMap : function() {
-                
+                debug_log('App.Trap.gameCreateMap()');
                 // Charge le fichier de template de l'écran de jeu principal
                 // et génère la grille de jeu dynamiquement
                 App.$gameArea.load("/partials/game-host-screen.htm", function() {
@@ -198,11 +209,13 @@ jQuery(function($){
             },
 
             gameDisplayTrap: function(data) {
+                debug_log('App.Trap.gameDisplayTrap()');
                 $('#btn_'+data.x+'_'+data.y).attr('class', 'btn btn-trapped btngame-trapscreen');
             },
 
             // réception du mouvement du chat coté trap
             catMoved: function(data) {
+                debug_log('App.Trap.catMoved()');
                 // déplace le chat sur la map
                 $('#btn_'+data.pos.old.i+'_'+data.pos.old.j).attr('class', 'btn btn-success btngame-trapscreen');
                 $('#btn_'+data.pos.neww.i+'_'+data.pos.neww.j).attr('class', 'btn btn-cat btngame-trapscreen');
@@ -212,6 +225,7 @@ jQuery(function($){
             },
 
             lockRandomButtons: function() {
+                debug_log('App.Trap.lockRandomButtons()');
                 var nbInitTraps = 7;
                 var data = {
                     x: null,
@@ -231,6 +245,7 @@ jQuery(function($){
 
             // Trap a gagné. Affiche "vous avez gagné !"
             trapVictory: function() {
+                debug_log('App.Trap.trapVictory()');
                 App.$gameArea.load("/partials/end-win.htm", function() {
                     $('#imgEndgame').prop('src', '../img/blackcatANGRY.gif');
                 });
@@ -238,6 +253,7 @@ jQuery(function($){
 
             // Cat a gagné. Affiche "vous avez perdu !"
             catVictory: function() {
+                debug_log('App.Trap.catVictory()');
                 App.$gameArea.load("/partials/end-loose.htm", function() {
                     $('#imgEndgame').prop('src', '../img/blackcatHAPPY.gif');
                 });
@@ -252,7 +268,7 @@ jQuery(function($){
 
             // Handler. Le bouton 'JOIN' a été cliqué, l'écran d'attente du chat est affiché.
             onJoinClick: function () {
-                debug_log('[JOIN GAME : 1/2] - Cat.onJoinClick (button event handler)');
+                debug_log('App.Cat.onJoinClick()');
 
                 // Display the Join Game HTML on the player's screen.    
                 App.$gameArea.load("/partials/waiting-join-game.htm");
@@ -266,6 +282,7 @@ jQuery(function($){
 
             // Affichage de l'écran de jeu du chat
             gameCreateMap: function(hostData) {
+                debug_log("App.Cat.gameCreateMap()");
                 App.Cat.hostSocketId = hostData.mySocketId;
                 App.$gameArea.load("/partials/game-cat-screen.htm", function() {
                     // Ajout de handlers sur les boutons
@@ -292,17 +309,17 @@ jQuery(function($){
             },
 
             onMoveButton: function(direction) {
-                debug_log("Yolo swag : " + direction);
+                debug_log("App.Cat.onMoveButton(direction=" + direction+")");
                 IO.socket.emit('clientMoveRequest', {'direction': direction });
             },
 
             gameLockButton: function(direction) {
-                debug_log('[BLABLABLABLA : 2/?] - gameLockButton('+direction+')');
+                debug_log('App.Cat.gameLockButton('+direction+')');
                 $('#'+direction).prop('disabled', true);
             },
 
             catMoved: function(data) {
-                debug_log("data.traps = ")
+                debug_log("App.Cat.catMoved(data.traps=");
                 debug_log(data.traps);
                 for (var elem in data.traps) {
                     App.Cat.gameLockButton(data.traps[elem]);
@@ -317,6 +334,7 @@ jQuery(function($){
 
             // Reset des boutons
             unlockButtons: function() {
+                debug_log("App.Cat.unlockButtons()");
                 $('#btn_topleft').prop('disabled', false);
                 $('#btn_topright').prop('disabled', false);
                 $('#btn_left').prop('disabled', false);
@@ -327,6 +345,7 @@ jQuery(function($){
 
             // Trap a gagné. Affiche "vous avez perdu !"
             trapVictory: function() {
+                debug_log("App.Cat.trapVictory()");
                 App.$gameArea.load("/partials/end-loose.htm", function() {
                     $('#imgEndgame').prop('src', '../img/blackcatANGRY.gif');
                 });
@@ -334,6 +353,7 @@ jQuery(function($){
 
             // Cat a gagné. Affiche "vous avez gagné !"
             catVictory: function() {
+                debug_log("App.Cat.catVictory()");
                 App.$gameArea.load("/partials/end-win.htm", function() {
                     $('#imgEndgame').prop('src', '../img/blackcatHAPPY.gif');
                 });
