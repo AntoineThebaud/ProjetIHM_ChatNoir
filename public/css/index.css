@@ -78,7 +78,16 @@ img {
   font-size: 30px;
   font-family: "Comic Sans MS";
   font-style: italic;
+  font-weight: 900;
   color: #449D44;
+}
+
+.disc-victory {
+  color: green !important;
+}
+
+.disc-defeat {
+  color: red !important;
 }
 
 .game-title {

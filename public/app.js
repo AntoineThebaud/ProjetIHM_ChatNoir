@@ -212,12 +212,12 @@ jQuery(function($){
             },
 
             lockRandomButtons: function() {
-                var nbInitTraps = 10;
+                var nbInitTraps = 7;
                 var data = {
                     x: null,
                     y: null
                 }
-                for(var i = 0; i <= nbInitTraps; i++) {
+                for(var i = 0; i < nbInitTraps; i++) {
                     data.x = Math.floor(Math.random() * 11),
                     data.y = Math.floor(Math.random() * 11)
                     //TODO : à optimiser : ne pas poser de piège sur la case du milieu (où le chat se trouve)
@@ -231,12 +231,16 @@ jQuery(function($){
 
             // Trap a gagné. Affiche "vous avez gagné !"
             trapVictory: function() {
-                App.$gameArea.load("/partials/end-win.htm");
+                App.$gameArea.load("/partials/end-win.htm", function() {
+                    $('#imgEndgame').prop('src', '../img/blackcatANGRY.gif');
+                });
             },
 
             // Cat a gagné. Affiche "vous avez perdu !"
             catVictory: function() {
-                App.$gameArea.load("/partials/end-loose.htm");
+                App.$gameArea.load("/partials/end-loose.htm", function() {
+                    $('#imgEndgame').prop('src', '../img/blackcatHAPPY.gif');
+                });
             }
         },
 
@@ -311,6 +315,7 @@ jQuery(function($){
                 }
             },
 
+            // Reset des boutons
             unlockButtons: function() {
                 $('#btn_topleft').prop('disabled', false);
                 $('#btn_topright').prop('disabled', false);
@@ -322,12 +327,16 @@ jQuery(function($){
 
             // Trap a gagné. Affiche "vous avez perdu !"
             trapVictory: function() {
-                App.$gameArea.load("/partials/end-loose.htm");
+                App.$gameArea.load("/partials/end-loose.htm", function() {
+                    $('#imgEndgame').prop('src', '../img/blackcatANGRY.gif');
+                });
             },
 
             // Cat a gagné. Affiche "vous avez gagné !"
             catVictory: function() {
-                App.$gameArea.load("/partials/end-win.htm");
+                App.$gameArea.load("/partials/end-win.htm", function() {
+                    $('#imgEndgame').prop('src', '../img/blackcatHAPPY.gif');
+                });
             }
         }
     };
