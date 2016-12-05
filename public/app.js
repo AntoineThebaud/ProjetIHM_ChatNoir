@@ -120,6 +120,11 @@ jQuery(function($){
             // Ajout d'events pour les boutons de l'écran d'accueil            
             App.$doc.on('click', '#btnCreateGame', App.Trap.onCreateClick);
             App.$doc.on('click', '#btnJoinGame', App.Cat.onJoinClick);
+            App.$doc.on('click', '#btnRules', App.displayRules);
+        },
+
+        displayRules: function() {
+            App.$gameArea.load("/partials/rules.htm");
         },
 
         // Variable utilisée comme namespace. Regroupe le code concernant le poseur de piège (trap)
