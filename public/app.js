@@ -75,12 +75,13 @@ jQuery(function($){
             App.Cat.unlockButtons();
         },
 
+        // Handler : Trap a gagné la partie
         trapWon: function() {
-            App.$gameArea.load("/partials/end-trap.htm");
+            App[App.myRole].trapVictory();
         },
 
         catWon: function() {
-            App.$gameArea.load("/partials/end-cat.htm");
+            App[App.myRole].catVictory();
         },
 
         // Handler. Popup d'erreur
@@ -213,6 +214,16 @@ jQuery(function($){
                     }
                     IO.socket.emit('hostInitTrap', data);
                 }                
+            },
+
+            // Trap a gagné. Affiche "vous avez gagné !"
+            trapVictory: function() {
+                App.$gameArea.load("/partials/end-win.htm");
+            },
+
+            // Cat a gagné. Affiche "vous avez perdu !"
+            catVictory: function() {
+                App.$gameArea.load("/partials/end-loose.htm");
             }
         },
 
@@ -294,6 +305,16 @@ jQuery(function($){
                 $('#btn_right').prop('disabled', false);
                 $('#btn_botleft').prop('disabled', false);
                 $('#btn_botright').prop('disabled', false);
+            },
+
+            // Trap a gagné. Affiche "vous avez perdu !"
+            trapVictory: function() {
+                App.$gameArea.load("/partials/end-loose.htm");
+            },
+
+            // Cat a gagné. Affiche "vous avez gagné !"
+            catVictory: function() {
+                App.$gameArea.load("/partials/end-win.htm");
             }
         }
     };

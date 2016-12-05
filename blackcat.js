@@ -112,6 +112,12 @@ function hostInitTrap(position) {
     // TODO : patch à optimiser
     position.init = true;
 
+    // Si le chat est à proximité : envoie d'un event à l'IHM cat (verrouillage d'une direction)
+    var near = isCatNear(position);
+    if (near != null) {
+        io.sockets.emit('directionForbidden', near);
+    }
+
     // mise à jour de la map sur l'IHM trap
     io.sockets.emit('trapPlaced', position);  
 }
