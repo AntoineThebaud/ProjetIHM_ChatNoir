@@ -42,8 +42,12 @@ img {
   pointer-events: none;
 }
 
-.line-offset {
-	margin-left: 28px;
+.left-offset {
+	padding-left: 28px;
+}
+
+.right-offset {
+  padding-right: 28px;
 }
 
 .line-offset-cat {
@@ -103,4 +107,17 @@ img {
 .btn-rules {
   background-color: white;
   border-color: gray;
+}
+
+.game-screen {
+  text-align: center;
+}
+
+.disc-role {
+  text-align: center;
+  margin-bottom: 35px;
+  font-size: 25px;
+  font-family: "Comic Sans MS";
+  font-weight: 900;
+  color: black;
 }
