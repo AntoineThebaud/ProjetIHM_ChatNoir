@@ -62,7 +62,7 @@ jQuery(function($){
             // TODO : patch à optimiser
             if (data.init != true) {
                 var turnArea = document.getElementById('turnArea');
-                turnArea.textContent = "C'est au tour de : Cat";
+                turnArea.textContent = "It's your turn !";
             }            
         },
 
@@ -182,7 +182,7 @@ jQuery(function($){
                             btnRow.appendChild(btn);
                         }
                         btnArea.appendChild(btnRow);
-                        turnArea.textContent = "C'est au tour de : Trap";              
+                        turnArea.textContent = "It's your turn !";              
                     }
                     // TODO : verrouiller un certain nombre de cases à l'initialisation
                     App.Trap.lockRandomButtons();
@@ -203,7 +203,7 @@ jQuery(function($){
                 $('#btn_'+data.pos.neww.i+'_'+data.pos.neww.j).attr('class', 'btn btn-cat btngame-trapscreen');
 
                 var turnArea = document.getElementById('turnArea');
-                turnArea.textContent = "C'est au tour de : Trap"; 
+                turnArea.textContent = "It's your turn !"; 
             },
 
             lockRandomButtons: function() {
@@ -278,7 +278,7 @@ jQuery(function($){
                     App.$doc.on('click', '#btn_botright', function(){
                         App.Cat.onMoveButton("botright");
                     });
-                    document.getElementById('turnArea').textContent = "C'est au tour de : Trap"; 
+                    document.getElementById('turnArea').textContent = "It's not your turn."; 
                 });
             },
 
@@ -298,7 +298,7 @@ jQuery(function($){
                 for (var elem in data.traps) {
                     App.Cat.gameLockButton(data.traps[elem]);
                 }
-                document.getElementById('turnArea').textContent = "C'est au tour de : Trap"; 
+                document.getElementById('turnArea').textContent = "It's not your turn."; 
 
                 // Notification d'opération réusise : faire vibrer l'appareil (si la vibration est supportée)
                 if ("vibrate" in navigator) {
