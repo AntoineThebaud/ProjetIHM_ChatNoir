@@ -4,6 +4,10 @@
 	font-weight: bold;
 }
 
+.menu-elements {
+  padding: 0px;
+}
+
 .btngame-trapscreen {
   width: 50px;
   height: 50px;
@@ -57,7 +61,8 @@ img{
 
 .btn-menu {
   padding: 12px 24px;
-  width: 105px;
+  width: 100%;
+  min-width: 105px;
   margin-top: 20px;
   font-size: 15px; 
   font-weight: bold;
@@ -70,5 +75,22 @@ img{
 
 .disclaimer {
   text-align: center;
-  font-size: 30px ;
+  font-size: 30px;
+  font-family: "Comic Sans MS";
+  font-style: italic;
+  color: #449D44;
+}
+
+.game-title {
+  margin-top: 15px;
+  text-align: center;
+  font-size: 30px;
+  font-family: "Comic Sans MS";
+  font-weight: 900;
+  color: black;
+}
+
+.btn-rules {
+  background-color: white;
+  border-color: gray;
 }
