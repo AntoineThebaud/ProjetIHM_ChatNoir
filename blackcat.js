@@ -117,6 +117,7 @@ function hostInitTrap(position) {
     // Si le chat est à proximité : envoie d'un event à l'IHM cat (verrouillage d'une direction)
     var near = isCatNear(position);
     if (near != null) {
+        debug_log('PIEGE ZAIHOJJEFA JEFZA JEFZAOJEFAJOIAEFOJADJIODZAJIODZAJIDZAZAJIDDZAIJDZAIJZDJKIDZKJDZKIDZ');
         io.sockets.emit('directionForbidden', near);
     }
 
