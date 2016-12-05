@@ -280,6 +280,11 @@ jQuery(function($){
                     App.Cat.gameLockButton(data.traps[elem]);
                 }
                 document.getElementById('turnArea').textContent = "C'est au tour de : Trap"; 
+
+                // Notification d'opération réusise : faire vibrer l'appareil (si la vibration est supportée)
+                if ("vibrate" in navigator) {
+                    navigator.vibrate(100);
+                }
             },
 
             unlockButtons: function() {
