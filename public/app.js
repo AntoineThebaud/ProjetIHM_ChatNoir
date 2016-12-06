@@ -26,6 +26,7 @@ jQuery(function($){
             IO.socket.on('directionForbidden', IO.directionForbidden);
             IO.socket.on('resetCatButtons', IO.resetCatButtons );
             IO.socket.on('RequestFailed', IO.requestFailed );
+            IO.socket.on('MovedSuccess', IO.movedSuccess);
 
 
             IO.socket.on('error', IO.error );
@@ -86,6 +87,13 @@ jQuery(function($){
             debug_log('IO.requestFailed()');
             var audio;
             audio = new Audio("/sound/error.wav");
+            audio.play();
+        },
+        
+        movedSuccess : function(){
+        		debug_log('IO.Movedsuccess()');
+            var audio;
+            audio = new Audio("/sound/jump.wav");
             audio.play();
         },
 
