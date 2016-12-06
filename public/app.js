@@ -177,7 +177,9 @@ jQuery(function($){
                         btnRow = document.createElement('div');
                         btnRow.id = "btnRow_"+i;
                         if (i % 2 == 1) {
-                            btnRow.className = 'line-offset';
+                            btnRow.className = 'left-offset';
+                        } else {
+                            btnRow.className = 'right-offset';
                         }
                         // Créé 11 boutons pour la ligne de la grille courante
                         for(var j = 0; j < 11; j++) {
