@@ -185,7 +185,7 @@ jQuery(function($){
                         for(var j = 0; j < 11; j++) {
                             btn = document.createElement('button');
                             btn.id = "btn_"+i+'_'+j;
-                            btn.className = "btn btn-success btngame-trapscreen";
+                            btn.className = "btn btn-empty btngame-trapscreen";
                             // Closure pour ajouter un handler sur chaque bouton
                             // Un bouton cliqué est vérouillé
                             btn.onclick = (function(x, y) {
@@ -219,7 +219,7 @@ jQuery(function($){
             catMoved: function(data) {
                 debug_log('App.Trap.catMoved()');
                 // déplace le chat sur la map
-                $('#btn_'+data.pos.old.i+'_'+data.pos.old.j).attr('class', 'btn btn-success btngame-trapscreen');
+                $('#btn_'+data.pos.old.i+'_'+data.pos.old.j).attr('class', 'btn btn-empty btngame-trapscreen');
                 $('#btn_'+data.pos.neww.i+'_'+data.pos.neww.j).attr('class', 'btn btn-cat btngame-trapscreen');
 
                 var turnArea = document.getElementById('turnArea');

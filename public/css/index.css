@@ -54,6 +54,12 @@
   pointer-events: none;
 }
 
+.btn-empty {
+	background-color: transparent;
+	border: 2px solid white;
+	background:url(/img/greenmap.jpg) no-repeat;
+}
+
 .left-offset {
 	padding-left: 28px;
 }
@@ -72,7 +78,6 @@
 }
 
 .trapArea {
-	background:url(/img/greenmap.jpg) no-repeat;
 }
 
 .row {
