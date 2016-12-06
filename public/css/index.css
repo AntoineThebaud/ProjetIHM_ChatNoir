@@ -46,6 +46,7 @@
 .btn-trapped {
 	background:url(/img/bomb.png) no-repeat;
   pointer-events: none;
+	background-color: transparent;
 }
 
 .btn-cat {
@@ -68,6 +69,10 @@
 .div-cat {
   width: 325px;
   height: 325px;
+}
+
+.trapArea {
+	background:url(/img/greenmap.jpg) no-repeat;
 }
 
 .row {
