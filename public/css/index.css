@@ -111,7 +111,14 @@
   font-family: "Comic Sans MS";
   font-style: italic;
   font-weight: 900;
-  color: #449D44;
+}
+
+.play {
+	color: #449D44;
+}
+
+.wait {
+	color: orange;
 }
 
 .disc-victory {

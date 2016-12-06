@@ -213,11 +213,13 @@ jQuery(function($){
 
             trapToPlay: function() {
               var turnArea = document.getElementById('turnArea');
+              turnArea.className = "disclaimer play";
               turnArea.textContent = "It's your turn ! choose a place to put a bomb";
             },
 
             catToPlay: function() {
               var turnArea = document.getElementById('turnArea');
+              turnArea.className = "disclaimer wait";
               turnArea.textContent = "Wait cat to play";
             },
 
@@ -292,12 +294,13 @@ jQuery(function($){
 
             trapToPlay: function() {
               var turnArea = document.getElementById('turnArea');
+              turnArea.className = "disclaimer wait";
               turnArea.textContent = "Wait trap to play";
             },
 
             catToPlay: function() {
-              console.log('I am the cat, cat to play');
               var turnArea = document.getElementById('turnArea');
+              turnArea.className = "disclaimer play";
               turnArea.textContent = "It's your turn play ! select a direction";
             },
 
@@ -326,6 +329,7 @@ jQuery(function($){
                         App.Cat.onMoveButton("botright");
                     });
                     document.getElementById('turnArea').textContent = "Wait trap to play";
+                    document.getElementById('turnArea').className = "disclaimer wait";
                 });
             },
 
