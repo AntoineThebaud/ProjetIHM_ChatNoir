@@ -35,6 +35,7 @@ jQuery(function($){
         catMoved : function(data) {
             debug_log('IO.catMoved()');
             App[App.myRole].catMoved(data);
+            App[App.myRole].trapToPlay();
         },
 
         // Handler. Connexion établie
@@ -65,9 +66,8 @@ jQuery(function($){
             App.Trap.gameDisplayTrap(data);
             // TODO : patch à optimiser
             if (data.init != true) {
-                var turnArea = document.getElementById('turnArea');
-                turnArea.textContent = "It's your turn !";
-            }            
+              App[App.myRole].catToPlay();
+            }
         },
 
         // Handler. Un piège a été posé prêt du chat (mise à jour de l'IHM cat)
@@ -200,14 +200,25 @@ jQuery(function($){
                             btnRow.appendChild(btn);
                         }
                         btnArea.appendChild(btnRow);
-                        turnArea.textContent = "It's your turn !";              
                     }
                     // TODO : verrouiller un certain nombre de cases à l'initialisation
                     App.Trap.lockRandomButtons();
 
+                    App.Trap.trapToPlay();
+
                     // Initialisation du chat (au milieu de la map)
                     $('#btn_5_5').attr('class', 'btn btn-cat btngame-trapscreen');
                 });
+            },
+
+            trapToPlay: function() {
+              var turnArea = document.getElementById('turnArea');
+              turnArea.textContent = "It's your turn ! choose a place to put a bomb";
+            },
+
+            catToPlay: function() {
+              var turnArea = document.getElementById('turnArea');
+              turnArea.textContent = "Wait cat to play";
             },
 
             gameDisplayTrap: function(data) {
@@ -221,9 +232,6 @@ jQuery(function($){
                 // déplace le chat sur la map
                 $('#btn_'+data.pos.old.i+'_'+data.pos.old.j).attr('class', 'btn btn-empty btngame-trapscreen');
                 $('#btn_'+data.pos.neww.i+'_'+data.pos.neww.j).attr('class', 'btn btn-cat btngame-trapscreen');
-
-                var turnArea = document.getElementById('turnArea');
-                turnArea.textContent = "It's your turn !"; 
             },
 
             lockRandomButtons: function() {
@@ -282,6 +290,17 @@ jQuery(function($){
                 App.myRole = 'Cat';
             },
 
+            trapToPlay: function() {
+              var turnArea = document.getElementById('turnArea');
+              turnArea.textContent = "Wait trap to play";
+            },
+
+            catToPlay: function() {
+              console.log('I am the cat, cat to play');
+              var turnArea = document.getElementById('turnArea');
+              turnArea.textContent = "It's your turn play ! select a direction";
+            },
+
             // Affichage de l'écran de jeu du chat
             gameCreateMap: function(hostData) {
                 debug_log("App.Cat.gameCreateMap()");
@@ -306,7 +325,7 @@ jQuery(function($){
                     App.$doc.on('click', '#btn_botright', function(){
                         App.Cat.onMoveButton("botright");
                     });
-                    document.getElementById('turnArea').textContent = "It's not your turn."; 
+                    document.getElementById('turnArea').textContent = "Wait trap to play";
                 });
             },
 
@@ -326,7 +345,6 @@ jQuery(function($){
                 for (var elem in data.traps) {
                     App.Cat.gameLockButton(data.traps[elem]);
                 }
-                document.getElementById('turnArea').textContent = "It's not your turn."; 
 
                 // Notification d'opération réusise : faire vibrer l'appareil (si la vibration est supportée)
                 if ("vibrate" in navigator) {
