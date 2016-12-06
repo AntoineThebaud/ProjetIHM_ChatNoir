@@ -155,3 +155,9 @@
   font-weight: 900;
   color: black;
 }
+
+.img-big {
+  display: block;
+  margin: 0 auto;
+  width: 100%;
+}
