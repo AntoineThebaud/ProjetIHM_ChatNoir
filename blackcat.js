@@ -100,6 +100,7 @@ function hostTrapRequest(position) {
 	}
 
     // passe la main au joueur chat
+    io.sockets.emit('MovedSuccess');
 	catTurn = true;    
 }
 
@@ -231,6 +232,7 @@ function clientMoveRequest(data) {
             traps: nearTraps
         }
         io.sockets.emit('catMoved', data);
+        io.sockets.emit('MovedSuccess', data);
     }
 
     // passe la main au joueur Trap
