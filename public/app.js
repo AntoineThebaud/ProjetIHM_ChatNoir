@@ -222,7 +222,7 @@ jQuery(function($){
             trapToPlay: function() {
               var turnArea = document.getElementById('turnArea');
               turnArea.className = "disclaimer play";
-              turnArea.textContent = "It's your turn ! choose a place to put a bomb";
+              turnArea.textContent = "It's your turn ! choose a place to put a trap";
             },
 
             catToPlay: function() {
